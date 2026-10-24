@@ -1,171 +1,128 @@
 # Job Mitra — Apna Career Mitra
-### Job Portal for Freshers and IT Job Seekers
 
-A modern, secure, and responsive recruitment platform built with **Python Flask**, **SQLite (with automatic MySQL engine support)**, **HTML5**, **CSS3 (Premium Glassmorphism + Modern SaaS)**, and **JavaScript**.
+A Flask-based job portal concept for fresh graduates and IT job seekers. The application brings together job discovery, candidate profiles, applications, recruiter workflows, moderation, and explainable job matching in one project.
 
----
+## Important hosting note
 
-## 🌟 Key Features
+**Repository:** https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra
 
-1. **Modern SaaS & Premium Glassmorphism Interface**:
-   - Styled using custom design tokens: Main Background `#0B1020`, Secondary `#111827`, Primary Accent `#6366F1`, Secondary Accent `#8B5CF6`, CTA Accent `#2563EB`, Main Text `#F8FAFC`, Secondary Text `#94A3B8`.
-   - Restrained translucent dark surfaces with backdrop blur (`blur(14px)`), smooth 0.2s cubic transitions, subtle glow accents, and responsive layout (375px, 430px, 768px, 1024px, 1440px).
+Job Mitra is a server-rendered Flask application, not a standalone static website. GitHub Pages cannot execute Flask or access its SQLite/MySQL database. The repository currently contains no dedicated static frontend deployment workflow, so there is no verified GitHub Pages site for the working application.
 
-2. **Role-Based Access Control (RBAC) & Multi-Tenant Architecture**:
-   - Distinct roles: **Candidate**, **Recruiter**, and **Administrator**.
-   - **Candidate Experience:** Personalized dashboard, true profile completion meter, technical skill manager, application tracker, saved jobs (bookmarks), and transparent recommendation scores.
-   - **Recruiter Console:** Job vacancy creation (`Draft`, `Pending Review`, `Published`, `Rejected`, `Closed`), authorized applicant list review, and applicant status management (`Submitted`, `Under Review`, `Shortlisted`, `Interviewing`, `Rejected`, `Hired`).
-   - **Administrator Command Center:** Platform metrics, job moderation queue, employer verification queue, fraud reports, payment audit ledger, and immutable security audit logs.
+To publish the actual app, deploy the Flask server to a Python-compatible host and configure its database, secret key, and other environment variables. Do not simply upload the `templates/` directory to GitHub Pages: Jinja expressions such as `{% ... %}` and `{{ ... }}` need Flask to render them.
 
-3. **Audited Payment State Machine**:
-   - Implements safe state transitions: `PENDING → VERIFIED → ACTIVE` (with terminal states `FAILED`, `CANCELLED`, `EXPIRED`).
-   - User-submitted UPI UTR reference codes enter state `PENDING` in our audited ledger.
-   - Transparently discloses local development mode as **Demo / Manual Verification Mode** — zero fake or unverified instant activations!
-   - Enforces transaction reference uniqueness, amount verification, and idempotency.
+## Core capabilities
 
-4. **Multi-Criteria Job Discovery & Transparent Match Engine**:
-   - Real-time search across roles, skills, employers, and descriptions with debounce.
-   - Server-side multi-faceted filtering: Location City, Academic Stream, Qualification, Experience Level, Work Mode (Onsite / Hybrid / Remote), Salary Range.
-   - Real database pagination and sorting.
-   - Transparent explainable recommendation engine computing scores based on verified technical skills (45%), stream match (25%), location preference (15%), and graduation batch eligibility (15%) with human-readable explanations.
+- Candidate, recruiter, and administrator workflows
+- Job search with filters and pagination
+- Candidate profile and technical skills management
+- Job applications and status tracking
+- Recruiter job posting and applicant management
+- Administrative moderation and employer-verification workflows
+- Explainable matching based on skills, stream, location, and graduation-batch fit
+- Security-focused request handling and database configuration
+- Automated tests and project audit documentation
 
-5. **Application Security & Hardening**:
-   - PBKDF2-HMAC-SHA256 password hashing via `werkzeug.security`.
-   - CSRF protection on all state-changing requests (`POST`, `PUT`, `DELETE`).
-   - Brute-force throttling (5 attempts / 15-minute lockout per IP / email).
-   - Strict candidate ownership validation: users cannot assign themselves elevated roles or alter their premium status through profile update payloads.
-   - Cross-tenant recruiter isolation: recruiters can only access their own postings and applicants.
-   - Safe administrator bootstrap procedure (`scripts/bootstrap_admin.py`).
+Actual behavior depends on the current code and configured services. Payment integration is documented as demo/manual verification mode unless a tested live gateway has been configured.
 
----
+## Technology stack
 
-## 🚀 Quick Start Guide
+| Layer | Technology |
+|---|---|
+| Backend / web framework | Python, Flask |
+| Templates | Jinja2 |
+| Frontend | HTML, CSS, JavaScript |
+| Database | SQLite by default; optional MySQL configuration |
+| Testing | pytest and HTTP smoke-test script |
+| Configuration | Environment variables |
 
-### 1. Prerequisites
-- Python 3.10+ (Tested on Python 3.14)
-- Git (optional)
+## Repository layout
 
-### 2. Install Dependencies
-In the project directory, install the required packages:
-```bash
+```text
+Job-Mitra-Apna-Career-Mitra/
+├── app.py                 # Flask application entry point
+├── config.py              # Environment-based configuration
+├── database.py            # Database layer
+├── matching.py            # Job matching and explanations
+├── security.py            # Authentication and security helpers
+├── routes/                # Auth, jobs, candidate, recruiter, admin, payments
+├── templates/             # Server-rendered Jinja templates
+├── static/                # CSS, JavaScript, and static assets
+├── database / schema.sql  # Database setup and schema
+├── scripts/               # Migration, admin bootstrap, smoke tests
+├── tests/                 # Automated tests
+├── docs/                  # Audit, security and test documentation
+├── requirements.txt
+└── .env.example
+```
+
+## Run locally on Windows
+
+### 1. Create a virtual environment
+
+From the repository root:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment Variables
-Copy `.env.example` to `.env`:
-```bash
+### 2. Configure the environment
+
+```powershell
 Copy-Item .env.example .env
 ```
-*(A default `.env` is already configured for local SQLite execution).*
 
-### 4. Database Setup & Migration
-To inspect and migrate the SQLite database with full data preservation:
-```bash
-python scripts/migrate.py
-```
+Edit `.env` and set a strong random `SECRET_KEY`. Use SQLite for a simple local start unless you specifically need MySQL. Keep the real `.env` file out of Git.
 
-### 5. (Optional) Bootstrap an Administrator
-To create or promote an administrator account safely:
-```bash
-# Interactive mode:
-python scripts/bootstrap_admin.py
+### 3. Start the web application
 
-# Or non-interactively in PowerShell:
-$env:ADMIN_EMAIL="admin@jobmitra.in"
-$env:ADMIN_NAME="Super Administrator"
-$env:ADMIN_PASSWORD="AdminSecretPass2026!"
-python scripts/bootstrap_admin.py
-```
-
-### 6. Run the Application
-Start the Flask development server:
-```bash
+```powershell
 python app.py
 ```
-Open your browser and navigate to:
-```
+
+Open:
+
+```text
 http://127.0.0.1:5000
 ```
 
----
+### 4. Run tests
 
-## 🔑 Demonstration Accounts for Testing
-
-The local database is pre-seeded with three demonstration accounts:
-
-| Role | Email | Password | Dashboard URL |
-|---|---|---|---|
-| **Candidate** | `aditya.engineer@jobmitra.in` | `Candidate@123` | `http://127.0.0.1:5000/candidate/dashboard` |
-| **Recruiter** | `priya.recruiter@technova.in` | `Recruiter@123` | `http://127.0.0.1:5000/recruiter/dashboard` |
-| **Admin** | `admin@jobmitra.in` | `AdminSecretPass2026!` | `http://127.0.0.1:5000/admin/dashboard` |
-
-*(Quick 1-click credential fill buttons are also available on the Login page at `/auth/login`)*.
-
----
-
-## 🧪 Running Automated Tests
-
-Run the full automated test suite using `pytest`:
-```bash
+```powershell
 python -m pytest tests/ -v
-```
-
-Run end-to-end live HTTP route smoke tests:
-```bash
 python scripts/smoke_test.py
 ```
 
----
+Run the tests in your local environment and review the output; this README does not imply a fresh test run has been performed.
 
-## 📂 Project Architecture
+## Deployment checklist
 
-```
-JOB PORTAL 001/
-├── app.py                     # Application factory and server entrypoint
-├── config.py                  # Environment-based configuration
-├── database.py                # Dual SQLite / MySQL database layer with foreign keys
-├── security.py                # RBAC decorators, CSRF protection, password hashing
-├── matching.py                # Explainable job recommendation engine
-├── requirements.txt           # Pinned production and test dependencies
-├── .env.example               # Safe environment variable template
-├── .env                       # Local environment settings
-├── jobmitra_local.db          # Migrated multi-tenant SQLite database
-├── routes/
-│   ├── auth.py                # Login, Register, Logout, Session state
-│   ├── candidate.py           # Candidate dashboard, skills, profile, applications
-│   ├── recruiter.py           # Recruiter console, job posting, applicant review
-│   ├── admin.py               # Moderation queue, employer verification, payment audit
-│   ├── jobs.py                # Job discovery, filters, details, bookmarks, apply, report
-│   └── payments.py            # UPI Pro subscription plans, UTR submission (PENDING)
-├── templates/
-│   ├── base.html              # Base layout with Glassmorphism navigation and modals
-│   ├── index.html             # Redesigned homepage
-│   ├── jobs/
-│   │   ├── index.html         # Dedicated multi-criteria search page
-│   │   └── detail.html        # Job details with transparent specs and demo warnings
-│   ├── auth/                  # Login, Register, Forgot Password
-│   ├── candidate/             # Candidate dashboard
-│   ├── recruiter/             # Recruiter dashboard, Post job, Applicant tracker
-│   ├── admin/                 # Command center, Moderation, Payments, Employers, Reports
-│   └── components/modals/     # Subscription, 1-Click Apply, Send Mail, Report modals
-├── static/
-│   ├── css/style.css          # Design system stylesheet
-│   └── js/app.js              # Client application engine
-├── scripts/
-│   ├── migrate.py             # Schema migration preserving existing data
-│   ├── bootstrap_admin.py     # Administrator creation tool
-│   └── smoke_test.py          # End-to-end HTTP smoke test runner
-├── tests/                     # 29 automated pytest unit and integration tests
-└── docs/
-    ├── PROJECT_AUDIT.md       # Initial project audit report
-    ├── SECURITY.md            # Application security architecture
-    └── TEST_REPORT.md         # Automated test execution report
-```
+For a public deployment:
 
----
+1. Choose a Python-compatible web host and use its supported production startup command.
+2. Set `SECRET_KEY`, database connection settings, and mail settings in the host's environment configuration.
+3. Use a persistent/managed database for production rather than relying on an ephemeral local SQLite file.
+4. Set secure session-cookie settings when HTTPS is enabled.
+5. Disable debug mode.
+6. Verify registration, login, job search, applications, recruiter access, and administrator actions on the deployed service.
+7. Review the security and test reports under `docs/`.
 
-## 📄 Documentation
+## Security and scope
 
-- [Project Audit Report](docs/PROJECT_AUDIT.md)
-- [Security Architecture & Controls](docs/SECURITY.md)
-- [Automated Test Execution Report](docs/TEST_REPORT.md)
+- Never commit a real `.env`, credentials, API keys, payment secrets, or production database dumps.
+- Use HTTPS and secure cookies in production.
+- Do not rely on client-side role checks; enforce authorization on the server.
+- Payment verification and employer verification need operational review before real-world use.
+- This is an academic portfolio project and should be security-reviewed before being used with real candidate information.
+
+## Documentation
+
+- [Project audit](docs/PROJECT_AUDIT.md)
+- [Security architecture](docs/SECURITY.md)
+- [Test report](docs/TEST_REPORT.md)
+
+## Author
+
+**Lomesh Pawar** · [GitHub](https://github.com/lomeshpawar)
