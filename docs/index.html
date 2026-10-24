@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="Job Mitra — Apna Career Mitra, a job portal portfolio project by Lomesh Pawar.">
+  <title>Job Mitra — Apna Career Mitra</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b1020;color:#f8fafc}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;line-height:1.65;background:radial-gradient(ellipse at 15% 5%,#30265f 0,transparent 42%),radial-gradient(ellipse at 90% 40%,#123b56 0,transparent 38%),#0b1020}
+    a{color:#c4b5fd}a:focus-visible{outline:3px solid #a5b4fc;outline-offset:4px}.wrap{max-width:1050px;margin:auto;padding:28px 22px 56px}
+    nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0 44px}.brand{font-weight:800;font-size:1.2rem;letter-spacing:-.04em}.brand span{color:#a5b4fc}.navlink{font-size:.93rem}
+    .tag{display:inline-flex;align-items:center;gap:8px;border:1px solid #51468a;background:#1a1740b8;border-radius:99px;padding:6px 12px;color:#ddd6fe;font-size:.88rem}
+    h1{font-size:clamp(2.8rem,8vw,5.5rem);line-height:1.02;letter-spacing:-.065em;margin:24px 0 18px;max-width:850px}.gradient{background:linear-gradient(90deg,#c4b5fd,#7dd3fc);color:transparent;background-clip:text}
+    .lead{max-width:720px;font-size:clamp(1.05rem,2.5vw,1.25rem);color:#cbd5e1}.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 48px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;font-weight:700;text-decoration:none;border:1px solid #4f46e5;background:#4f46e5;color:white}.btn.secondary{background:#111827b8;border-color:#475569;color:#e2e8f0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:24px 0}.card{border:1px solid #334155;background:#111827cc;border-radius:18px;padding:22px;box-shadow:0 16px 50px #0002}.icon{width:40px;height:40px;display:grid;place-items:center;background:#292453;border-radius:12px;font-size:1.25rem}.card h2{font-size:1.08rem;margin:14px 0 8px}.card p{color:#cbd5e1;margin:0;font-size:.96rem}.section-title{font-size:1.6rem;letter-spacing:-.035em;margin:48px 0 8px}.muted{color:#94a3b8}.notice{border:1px solid #854d0e;background:#42200655;border-radius:16px;padding:18px 20px;color:#fde68a;margin-top:26px}.notice strong{display:block;margin-bottom:4px}.notice p{margin:0;color:#fde68a}.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.step{padding:18px;border-left:2px solid #6366f1;background:#11182780;border-radius:0 12px 12px 0}.step strong{display:block;margin-bottom:6px}.step p{margin:0;color:#cbd5e1}.foot{border-top:1px solid #334155;margin-top:48px;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;color:#94a3b8;font-size:.9rem}
+    @media(max-width:520px){nav{padding-bottom:32px}.wrap{padding-inline:16px}.btn{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav aria-label="Main navigation">
+      <div class="brand">Job<span>Mitra</span></div>
+      <a class="navlink" href="https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra">View source on GitHub ↗</a>
+    </nav>
+    <span class="tag">✦ Career platform · Academic portfolio project</span>
+    <h1>Apna career. <span class="gradient">Your next step.</span></h1>
+    <p class="lead">Job Mitra is a job-portal project designed around the needs of fresh graduates and IT job seekers, bringing candidate, recruiter, and administrator workflows into one place.</p>
+    <div class="actions">
+      <a class="btn" href="https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra">Explore the project repository ↗</a>
+      <a class="btn secondary" href="https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra#run-locally-on-windows">Local setup guide</a>
+    </div>
+    <h2 class="section-title">Designed for the job journey</h2>
+    <p class="muted">A high-level overview of the project's intended capabilities.</p>
+    <section class="grid" aria-label="Project capabilities">
+      <article class="card"><div class="icon" aria-hidden="true">⌕</div><h2>Job discovery</h2><p>Search, filter, and browse opportunities with pagination and relevant job details.</p></article>
+      <article class="card"><div class="icon" aria-hidden="true">♙</div><h2>Candidate workspace</h2><p>Manage candidate profiles, skills, applications, and application status tracking.</p></article>
+      <article class="card"><div class="icon" aria-hidden="true">▣</div><h2>Recruiter tools</h2><p>Support job posting and applicant-management workflows for recruiters.</p></article>
+      <article class="card"><div class="icon" aria-hidden="true">✧</div><h2>Explainable matching</h2><p>Show job-fit reasoning based on factors such as skills, location, and graduation batch.</p></article>
+      <article class="card"><div class="icon" aria-hidden="true">✓</div><h2>Administration</h2><p>Provide moderation and employer-verification workflows for platform oversight.</p></article>
+      <article class="card"><div class="icon" aria-hidden="true">⌘</div><h2>Security-minded build</h2><p>Organized Flask routes, configuration, database access, documentation, and tests.</p></article>
+    </section>
+    <h2 class="section-title">Technology stack</h2>
+    <section class="grid">
+      <article class="card"><h2>Frontend</h2><p>HTML · CSS · JavaScript · Jinja2 templates</p></article>
+      <article class="card"><h2>Backend</h2><p>Python · Flask</p></article>
+      <article class="card"><h2>Data and quality</h2><p>SQLite / optional MySQL · pytest</p></article>
+    </section>
+    <aside class="notice">
+      <strong>Important: static preview only</strong>
+      <p>This GitHub Pages site is an informational frontend preview. GitHub Pages cannot execute Flask or Jinja templates. Login, live job search, applications, recruiter/admin workflows, and database operations require the Flask backend and a configured database; those features are not active on this page.</p>
+    </aside>
+    <h2 class="section-title">Run the full application locally</h2>
+    <section class="steps">
+      <div class="step"><strong>1. Install dependencies</strong><p>Use Python and install the packages listed in <a href="https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/blob/main/requirements.txt">requirements.txt</a>.</p></div>
+      <div class="step"><strong>2. Configure safely</strong><p>Copy <code>.env.example</code> to <code>.env</code> and set a strong local secret key. Never commit real credentials.</p></div>
+      <div class="step"><strong>3. Start Flask</strong><p>Run <code>python app.py</code> from the project root and open <code>http://127.0.0.1:5000</code>.</p></div>
+    </section>
+    <footer class="foot"><span>Built by Lomesh Pawar</span><span>Static preview · <a href="https://github.com/lomeshpawar">GitHub profile</a></span></footer>
+  </main>
+</body>
+</html>
