@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Applicants for {{ job.title }} — Recruiter Console{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <!-- Breadcrumb -->
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('recruiter.dashboard') }}">Recruiter Console</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">Applicants for {{ job.title }}</span>
+    </div>
+
+    <!-- Job Header Card -->
+    <div class="dash-header-card" style="margin-bottom:1.5rem;">
+        <div>
+            <div class="card-badges-row">
+                <span class="stream-badge">{{ job.stream }}</span>
+                <span class="badge-verified">{{ job.status }}</span>
+            </div>
+            <h1 style="font-size:1.5rem; color:#fff; margin-top:4px;">{{ job.title }}</h1>
+            <p>{{ job.company }} • {{ job.city }} ({{ job.work_mode or 'Onsite' }})</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <span class="badge-gold-star"><i class="fa-solid fa-users"></i> {{ applicants|length }} Total Candidates</span>
+            <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="btn-outline" style="font-size:0.8125rem;">View Vacancy</a>
+        </div>
+    </div>
+
+    <!-- Applicants Table -->
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:1rem;">
+            <i class="fa-solid fa-user-check text-primary"></i> Submitted Candidate Applications
+        </h3>
+
+        {% if applicants %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Candidate Name</th>
+                        <th>Contact Email & Phone</th>
+                        <th>Stream & Degree</th>
+                        <th>Skills</th>
+                        <th>Submission Date</th>
+                        <th>Application Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applicants %}
+                    <tr>
+                        <td>
+                            <strong style="color:#fff;">{{ app.candidate_name }}</strong>
+                            {% if app.cover_note %}
+                            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
+                                <em>"{{ app.cover_note }}"</em>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div><i class="fa-solid fa-envelope text-primary" style="font-size:0.75rem;"></i> {{ app.candidate_email }}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-phone text-warning" style="font-size:0.72rem;"></i> {{ app.candidate_phone }}</div>
+                        </td>
+                        <td>
+                            <div>{{ app.candidate_stream or app.stream or 'General' }}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">{{ app.education or 'Graduate' }}</div>
+                        </td>
+                        <td>
+                            <div style="font-size:0.78rem; color:var(--text-secondary); max-width:200px;">
+                                {{ app.candidate_skills or 'N/A' }}
+                            </div>
+                        </td>
+                        <td>{{ app.applied_at }}</td>
+                        <td>
+                            <select onchange="updateApplicantStatus({{ app.id }}, this.value)" style="background:var(--bg-input); border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm); padding:0.35rem 0.65rem; font-size:0.8125rem; font-weight:600;">
+                                <option value="Submitted" {% if app.status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                                <option value="Under Review" {% if app.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                                <option value="Shortlisted" {% if app.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                                <option value="Interviewing" {% if app.status == 'Interviewing' %}selected{% endif %}>Interviewing</option>
+                                <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                <option value="Hired" {% if app.status == 'Hired' %}selected{% endif %}>Hired</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:3rem; background:rgba(0,0,0,0.15); border-radius:var(--radius-sm);">
+            <i class="fa-solid fa-inbox" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Applications Received Yet</h4>
+            <p style="font-size:0.8125rem; color:var(--text-secondary);">Applications submitted by freshers will appear here in real time.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function updateApplicantStatus(appId, newStatus) {
+        try {
+            const res = await fetch(`/recruiter/api/applications/${appId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.error || 'Failed to update status', 'error');
+            }
+        } catch (e) {
+            showToast('Network error updating applicant status', 'error');
+        }
+    }
+</script>
+{% endblock %}

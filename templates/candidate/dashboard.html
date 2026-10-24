@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+
+{% block title %}Candidate Dashboard — Job Mitra{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <!-- Welcome Header Card -->
+    <div class="dash-header-card">
+        <div class="dash-header-left">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <h1>Welcome, {{ candidate.name }}</h1>
+                {% if candidate.is_premium %}
+                <span class="badge-gold-star"><i class="fa-solid fa-crown text-gold"></i> Pro Member</span>
+                {% else %}
+                <button class="btn-pro-subscription" onclick="openSubscriptionModal()" style="padding:2px 8px; font-size:0.75rem;">
+                    <i class="fa-solid fa-crown"></i> Get Pro
+                </button>
+                {% endif %}
+            </div>
+            <p>{{ candidate.stream }} • {{ candidate.education }} ({{ candidate.city or 'Bengaluru' }})</p>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <!-- Profile Completion Meter -->
+            <div class="profile-completion-box">
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">
+                        <span>Profile Completion</span>
+                        <span style="color:var(--primary);">{{ profile_pct }}%</span>
+                    </div>
+                    <div class="completion-bar-track">
+                        <div class="completion-bar-fill" style="width: {{ profile_pct }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="openEditProfileModal()">
+                <i class="fa-solid fa-user-pen"></i> Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- 4 Key Candidate Metric Cards -->
+    <div class="metrics-grid" style="margin: 1.5rem 0;">
+        <div class="metric-card card-blue">
+            <div class="metric-icon"><i class="fa-solid fa-paper-plane"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ app_count }}</span>
+                <span class="metric-label">Applications Submitted</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-gold">
+            <div class="metric-icon"><i class="fa-solid fa-bookmark"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ saved_count }}</span>
+                <span class="metric-label">Saved Job Bookmarks</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-purple">
+            <div class="metric-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ candidate.skills.split(',')|length if candidate.skills else 0 }}</span>
+                <span class="metric-label">Technical Skills Verified</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-green">
+            <div class="metric-icon"><i class="fa-solid fa-crown"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{% if candidate.is_premium %}Active{% else %}Free{% endif %}</span>
+                <span class="metric-label">Subscription Tier</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Technical Skills Manager -->
+    <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+            <div>
+                <h3 style="font-size:1.15rem; font-weight:700; color:#fff;">
+                    <i class="fa-solid fa-code text-primary"></i> Technical Skills & Competencies
+                </h3>
+                <p style="font-size:0.8125rem; color:var(--text-secondary);">
+                    Add verified programming languages, CAD packages, or tools to dynamically calculate match scores.
+                </p>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="candidateSkillInput" placeholder="Type a skill (e.g. Python, SQL, AutoCAD)..." style="background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.45rem 0.85rem; color:#fff; font-size:0.84rem;" onkeydown="handleSkillAddKey(event)">
+                <button type="button" class="btn-primary" onclick="submitCandidateSkillAdd()" style="padding:0.45rem 0.85rem; font-size:0.8125rem;">
+                    <i class="fa-solid fa-plus"></i> Add
+                </button>
+            </div>
+        </div>
+
+        <!-- Render Current Skills Chips -->
+        <div id="candidateSkillsList" style="display:flex; flex-wrap:wrap; gap:8px;">
+            {% if candidate.skills %}
+                {% for sk in candidate.skills.split(',') %}
+                    {% if sk.strip() %}
+                    <span class="skill-tag" style="padding:4px 10px; font-size:0.84rem; display:inline-flex; align-items:center; gap:6px; background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.3); color:#A5B4FC;">
+                        <span>{{ sk.strip() }}</span>
+                        <button type="button" onclick="removeSkillChip('{{ sk.strip()|escape }}')" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer;" aria-label="Remove skill"><i class="fa-solid fa-xmark"></i></button>
+                    </span>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <span style="font-size:0.8125rem; color:var(--text-muted);">No skills added yet. Type your skills above!</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Application Funnel & Tracker -->
+    <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;" id="applications">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <div>
+                <h3 style="font-size:1.15rem; font-weight:700; color:#fff;">
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i> Application Status Tracker
+                </h3>
+                <p style="font-size:0.8125rem; color:var(--text-secondary);">Direct status updates from employer review teams.</p>
+            </div>
+            <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> {{ applications|length }} Active</span>
+        </div>
+
+        {% if applications %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Job Title & Company</th>
+                        <th>Location</th>
+                        <th>Salary Package</th>
+                        <th>Submission Date</th>
+                        <th>Recruiter Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>
+                            <strong style="color:#fff;">{{ app.title }}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-secondary);">{{ app.company }}</div>
+                        </td>
+                        <td>{{ app.city }}</td>
+                        <td><span style="color:#4ADE80; font-weight:700;">₹{{ "{:,}".format(app.salary_min) }} - ₹{{ "{:,}".format(app.salary_max) }}</span></td>
+                        <td>{{ app.applied_at }}</td>
+                        <td>
+                            <span class="badge-verified" style="{% if app.status == 'Rejected' %}background:var(--danger-bg); color:var(--danger);{% elif app.status in ('Shortlisted', 'Interviewing', 'Hired') %}background:var(--success-bg); color:var(--success);{% else %}background:rgba(99,102,241,0.15); color:var(--primary);{% endif %}">
+                                {{ app.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('jobs.job_detail', job_id=app.job_id) }}" class="btn-outline" style="padding:3px 8px; font-size:0.75rem;">View Specs</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2rem; background:rgba(0,0,0,0.15); border-radius:var(--radius-sm);">
+            <i class="fa-solid fa-paper-plane" style="font-size:2rem; color:var(--text-muted); margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Applications Submitted Yet</h4>
+            <p style="font-size:0.8125rem; color:var(--text-secondary); margin-bottom:1rem;">Explore open vacancies tailored for your stream and apply with 1-click.</p>
+            <a href="{{ url_for('jobs.search_page') }}" class="btn-primary">Browse Vacancies</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recommended Jobs Based on Candidate Skills -->
+    <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <div>
+                <h3 style="font-size:1.15rem; font-weight:700; color:#fff;">
+                    <i class="fa-solid fa-bullseye text-gold"></i> Recommended for You
+                </h3>
+                <p style="font-size:0.8125rem; color:var(--text-secondary);">Transparent algorithmic match based on your skills, stream, and location.</p>
+            </div>
+            <a href="{{ url_for('jobs.search_page') }}" class="btn-outline">Search All →</a>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;">
+            {% for r_job in recommended_jobs %}
+            <div class="glass-panel" style="padding:1rem; border-color:var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <span class="match-badge"><i class="fa-solid fa-check"></i> {{ r_job.match_pct }}% Match</span>
+                    <button class="btn-icon-action" onclick="toggleJobBookmark({{ r_job.id }}, this)" style="width:28px; height:28px; font-size:0.75rem;"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+                <h4 style="color:#fff; font-size:0.95rem; margin:6px 0 2px 0;">
+                    <a href="{{ url_for('jobs.job_detail', job_id=r_job.id) }}" style="color:#fff;">{{ r_job.title }}</a>
+                </h4>
+                <div style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:6px;">{{ r_job.company }} • {{ r_job.city }}</div>
+                <div style="font-size:0.84rem; font-weight:700; color:#4ADE80; margin-bottom:8px;">
+                    ₹{{ "{:,}".format(r_job.salary_min) }} - ₹{{ "{:,}".format(r_job.salary_max) }}/mo
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.7rem; color:var(--text-muted);">{{ r_job.stream }}</span>
+                    <a href="{{ url_for('jobs.job_detail', job_id=r_job.id) }}" class="btn-primary" style="padding:3px 10px; font-size:0.75rem;">Apply →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Saved Jobs (Bookmarks) -->
+    <div class="glass-panel" style="padding: 1.5rem;" id="saved">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <div>
+                <h3 style="font-size:1.15rem; font-weight:700; color:#fff;">
+                    <i class="fa-solid fa-bookmark text-gold"></i> Saved Vacancies
+                </h3>
+                <p style="font-size:0.8125rem; color:var(--text-secondary);">Jobs you have shortlisted for application.</p>
+            </div>
+            <span class="badge-gold-star"><i class="fa-solid fa-bookmark"></i> {{ saved_jobs|length }} Saved</span>
+        </div>
+
+        {% if saved_jobs %}
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;">
+            {% for s_job in saved_jobs %}
+            <div class="glass-panel" style="padding:1rem;">
+                <h4 style="color:#fff; font-size:0.95rem; margin-bottom:4px;">
+                    <a href="{{ url_for('jobs.job_detail', job_id=s_job.id) }}" style="color:#fff;">{{ s_job.title }}</a>
+                </h4>
+                <div style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:8px;">{{ s_job.company }} • {{ s_job.city }}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <a href="{{ url_for('jobs.job_detail', job_id=s_job.id) }}" class="btn-outline" style="padding:4px 10px; font-size:0.75rem;">View Vacancy</a>
+                    <button class="btn-icon-action active" onclick="toggleJobBookmark({{ s_job.id }}, this)" title="Remove bookmark" style="width:30px; height:30px;"><i class="fa-solid fa-bookmark text-gold"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2rem; background:rgba(0,0,0,0.15); border-radius:var(--radius-sm);">
+            <i class="fa-regular fa-bookmark" style="font-size:2rem; color:var(--text-muted); margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Bookmarks Saved</h4>
+            <p style="font-size:0.8125rem; color:var(--text-secondary);">Click the bookmark icon on any vacancy card to save it for later review.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <div>
+                <span class="badge-urgent"><i class="fa-solid fa-user-pen"></i> CANDIDATE PROFILE</span>
+                <h3 style="color:#fff; margin-top:4px;">Edit Profile Settings</h3>
+            </div>
+            <button class="modal-close" onclick="closeEditProfileModal()" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="editProfileForm" onsubmit="handleCandidateProfileSave(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="epName">Full Name *</label>
+                        <input type="text" id="epName" value="{{ candidate.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="epPhone">Contact Phone *</label>
+                        <input type="text" id="epPhone" value="{{ candidate.phone }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="epCity">Preferred City *</label>
+                        <input type="text" id="epCity" value="{{ candidate.city or 'Bengaluru' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="epGradYear">Graduation Year</label>
+                        <input type="text" id="epGradYear" value="{{ candidate.graduation_year or '2026' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="epStream">Engineering / Graduate Stream *</label>
+                    <select id="epStream">
+                        <option value="Computer Science / IT" {% if candidate.stream == 'Computer Science / IT' %}selected{% endif %}>Computer Science & IT</option>
+                        <option value="Mechanical Engineering" {% if candidate.stream == 'Mechanical Engineering' %}selected{% endif %}>Mechanical Engineering</option>
+                        <option value="Civil Engineering" {% if candidate.stream == 'Civil Engineering' %}selected{% endif %}>Civil Engineering</option>
+                        <option value="Electrical Engineering" {% if candidate.stream == 'Electrical Engineering' %}selected{% endif %}>Electrical Engineering (EEE)</option>
+                        <option value="Electronics & Communication" {% if candidate.stream == 'Electronics & Communication' %}selected{% endif %}>Electronics & Comm (ECE)</option>
+                        <option value="Chemical Engineering" {% if candidate.stream == 'Chemical Engineering' %}selected{% endif %}>Chemical Engineering</option>
+                        <option value="Mechatronics / Robotics" {% if candidate.stream == 'Mechatronics / Robotics' %}selected{% endif %}>Mechatronics & Robotics</option>
+                        <option value="Any Graduate (All Streams)" {% if candidate.stream == 'Any Graduate (All Streams)' %}selected{% endif %}>Any Graduate (General / Ops)</option>
+                        <option value="Commerce & Finance (Graduates)" {% if candidate.stream == 'Commerce & Finance (Graduates)' %}selected{% endif %}>Commerce & Finance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="epEdu">Degree / Education Details</label>
+                    <input type="text" id="epEdu" value="{{ candidate.education or 'B.Tech / Graduate' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="epBio">Professional Bio & Career Objective</label>
+                    <textarea id="epBio" rows="3" placeholder="Brief statement about your career aspirations and key strengths...">{{ candidate.bio or '' }}</textarea>
+                </div>
+
+                <div class="modal-footer" style="padding:0; margin-top:1rem; border:none;">
+                    <button type="button" class="btn-secondary" onclick="closeEditProfileModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btnSaveProfile">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Profile Details
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openEditProfileModal() {
+        document.getElementById('editProfileModal').classList.add('active');
+    }
+    function closeEditProfileModal() {
+        document.getElementById('editProfileModal').classList.remove('active');
+    }
+
+    async function handleCandidateProfileSave(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSaveProfile');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+        const payload = {
+            name: document.getElementById('epName').value.trim(),
+            phone: document.getElementById('epPhone').value.trim(),
+            city: document.getElementById('epCity').value.trim(),
+            graduation_year: document.getElementById('epGradYear').value.trim(),
+            stream: document.getElementById('epStream').value,
+            education: document.getElementById('epEdu').value.trim(),
+            bio: document.getElementById('epBio').value.trim()
+        };
+
+        try {
+            const res = await fetch('/candidate/api/profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                closeEditProfileModal();
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to update profile', 'error');
+            }
+        } catch (err) {
+            showToast('Network error saving profile', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Profile Details';
+        }
+    }
+
+    function handleSkillAddKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitCandidateSkillAdd();
+        }
+    }
+
+    async function submitCandidateSkillAdd() {
+        const input = document.getElementById('candidateSkillInput');
+        const skill = input.value.trim();
+        if (!skill) return;
+
+        try {
+            const res = await fetch('/candidate/api/skills', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ skill: skill, action: 'add' })
+            });
+            const data = await res.json();
+            if (data.success) {
+                input.value = '';
+                showToast(`Skill "${skill}" added to profile!`, 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                showToast(data.error || 'Could not add skill', 'error');
+            }
+        } catch (e) {
+            showToast('Network error adding skill', 'error');
+        }
+    }
+
+    async function removeSkillChip(skill) {
+        try {
+            const res = await fetch('/candidate/api/skills', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ skill: skill, action: 'remove' })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Skill "${skill}" removed`, 'gold');
+                setTimeout(() => window.location.reload(), 800);
+            }
+        } catch (e) {
+            showToast('Network error removing skill', 'error');
+        }
+    }
+</script>
+{% endblock %}

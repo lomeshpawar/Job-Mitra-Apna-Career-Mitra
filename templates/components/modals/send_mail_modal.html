@@ -1,0 +1,59 @@
+<!-- Send Mail to HR Modal -->
+<div class="modal-overlay" id="sendMailModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <div>
+                <span class="badge-gold-star"><i class="fa-solid fa-envelope"></i> DIRECT RECRUITER CONTACT</span>
+                <h3 id="mailModalJobTitle" style="color:#fff; margin-top:4px; font-size:1.15rem;">Send Email to HR</h3>
+                <p id="mailModalCompany" style="color:var(--primary); font-size:0.84rem;">Company</p>
+            </div>
+            <button class="modal-close" onclick="closeSendMailModal()" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            {% if is_logged_in %}
+            <form id="sendMailForm" onsubmit="handleSendMailSubmit(event)">
+                <input type="hidden" id="mailJobId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-at text-primary"></i> Recipient HR Email</label>
+                        <input type="email" id="mailRecipientEmail" readonly style="opacity:0.85; cursor:not-allowed;">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-phone text-primary"></i> HR Phone Contact</label>
+                        <input type="text" id="mailRecipientPhone" readonly style="opacity:0.85; cursor:not-allowed;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mailSubject"><i class="fa-solid fa-heading text-primary"></i> Email Subject *</label>
+                    <input type="text" id="mailSubject" required value="Job Application / Inquiry via Job Mitra">
+                </div>
+
+                <div class="form-group">
+                    <label for="mailMessage"><i class="fa-solid fa-comment-dots text-primary"></i> Cover Pitch & Message to HR *</label>
+                    <textarea id="mailMessage" rows="5" required placeholder="Write a professional note introducing your degree, core skills, and interest in this role..."></textarea>
+                </div>
+
+                <div class="modal-footer" style="padding:0; margin-top:1rem; border:none;">
+                    <button type="button" class="btn-secondary" onclick="closeSendMailModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btnSubmitMail">
+                        <i class="fa-solid fa-paper-plane"></i> Send Direct Email
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div style="text-align:center; padding:1.5rem 0;">
+                <i class="fa-solid fa-envelope-circle-check" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:1rem;"></i>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">Sign In to Contact HR</h3>
+                <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:1.5rem;">
+                    Sign in with your verified Job Mitra account to send direct email inquiries to recruiters.
+                </p>
+                <div style="display:flex; justify-content:center; gap:0.75rem;">
+                    <a href="{{ url_for('auth.login') }}" class="btn-secondary">Sign In</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn-primary">Create Account</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

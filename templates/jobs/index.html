@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Vacancies — Job Mitra | Freshers & Graduate IT Jobs{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 1.5rem;">
+    <!-- Search Bar Card -->
+    <div class="search-box-card">
+        <div class="search-inputs-grid">
+            <div class="input-group">
+                <i class="fa-solid fa-magnifying-glass input-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by Job Role, Stream, Company, or Skill (e.g. Python, CAD, SQL)..." oninput="debounceJobSearch()">
+                <button class="clear-btn" id="clearSearchBtn" onclick="clearJobSearch()" style="display:none;" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-location-dot input-icon"></i>
+                <select id="citySelect" onchange="triggerSearch()">
+                    <option value="all">📍 All Cities</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Delhi NCR">Delhi NCR</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                    <option value="Vadodara">Vadodara</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-graduation-cap input-icon"></i>
+                <select id="streamSelect" onchange="triggerSearch()">
+                    <option value="all">🎓 All Streams</option>
+                    <option value="Computer Science / IT">Computer Science & IT</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="Electrical Engineering">Electrical Engineering</option>
+                    <option value="Electronics & Communication">Electronics & Comm (ECE)</option>
+                    <option value="Chemical Engineering">Chemical Engineering</option>
+                    <option value="Mechatronics / Robotics">Mechatronics & Robotics</option>
+                    <option value="Instrumentation & Control">Instrumentation & Control</option>
+                    <option value="Biotechnology / Biomedical">Biotechnology & Biomedical</option>
+                    <option value="Aerospace / Aeronautical">Aerospace & Aeronautical</option>
+                    <option value="Environmental Engineering">Environmental & EHS</option>
+                    <option value="Any Graduate (All Streams)">Any Graduate (All Streams)</option>
+                    <option value="Commerce & Finance (Graduates)">Commerce & Finance</option>
+                    <option value="Any Graduate / Media / BBA">Digital Marketing & Media</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-primary" onclick="triggerSearch()">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+        </div>
+
+        <div class="search-sub-bar">
+            <div class="filter-toggles">
+                <label class="toggle-container" title="Filter for exclusive Pro priority roles">
+                    <input type="checkbox" id="premiumFilterToggle" onchange="triggerSearch()">
+                    <span><i class="fa-solid fa-crown text-gold"></i> Pro Priority Roles Only</span>
+                </label>
+                <label class="toggle-container" title="Filter for immediate joiner openings">
+                    <input type="checkbox" id="urgentFilterToggle" onchange="triggerSearch()">
+                    <span><i class="fa-solid fa-bolt text-danger"></i> Urgent Hiring Only</span>
+                </label>
+            </div>
+
+            <div class="active-filter-summary">
+                Showing <strong id="filterCountDisplay">--</strong> vacancies
+            </div>
+        </div>
+    </div>
+
+    <!-- Layout Grid: Sidebar Filters + Center Job List -->
+    <div class="jobs-layout-grid">
+        <!-- Sidebar Filters -->
+        <aside class="filters-sidebar" id="filtersSidebar">
+            <!-- Pro Sidebar Card -->
+            <div class="pro-promo-card" onclick="openSubscriptionModal()">
+                <div class="pro-promo-badge"><i class="fa-solid fa-crown"></i> JOB MITRA PRO</div>
+                <h4>Supercharge Your Career</h4>
+                <p>Unlock direct recruiter WhatsApp lines & top 1% interview ranking via UPI.</p>
+                <div class="upi-display-box">
+                    <span>UPI: <strong>{{ app_upi_id }}</strong></span>
+                </div>
+                <button class="btn-pro-activate">Upgrade from ₹99 →</button>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-header">
+                    <h4><i class="fa-solid fa-sliders"></i> Filter Criteria</h4>
+                    <button class="btn-reset-filters" onclick="resetAllJobFilters()">Reset All</button>
+                </div>
+
+                <!-- Work Mode Filter -->
+                <div class="filter-group">
+                    <label class="filter-heading">Work Mode</label>
+                    <select id="workModeSelect" class="form-group select" onchange="triggerSearch()" style="width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text-main); border-radius:var(--radius-sm); padding:0.5rem;">
+                        <option value="all">All Modes</option>
+                        <option value="Onsite">Onsite</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Remote">100% Remote</option>
+                    </select>
+                </div>
+
+                <!-- Experience Level -->
+                <div class="filter-group">
+                    <label class="filter-heading">Experience Level</label>
+                    <select id="experienceSelect" onchange="triggerSearch()" style="width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text-main); border-radius:var(--radius-sm); padding:0.5rem;">
+                        <option value="all">All Experience Levels</option>
+                        <option value="Freshers / 0-1 yr">Freshers (0 - 1 yr)</option>
+                        <option value="Freshers / 0-2 yrs">Freshers / Entry (0 - 2 yrs)</option>
+                    </select>
+                </div>
+
+                <!-- Minimum Salary Filter -->
+                <div class="filter-group">
+                    <label class="filter-heading">Minimum Monthly Salary</label>
+                    <select id="minSalarySelect" onchange="triggerSearch()" style="width:100%; background:var(--bg-input); border:1px solid var(--border); color:var(--text-main); border-radius:var(--radius-sm); padding:0.5rem;">
+                        <option value="">Any Salary</option>
+                        <option value="20000">₹20,000+ / mo</option>
+                        <option value="25000">₹25,000+ / mo</option>
+                        <option value="30000">₹30,000+ / mo</option>
+                        <option value="35000">₹35,000+ / mo</option>
+                    </select>
+                </div>
+
+                <!-- Quick Stream Pills -->
+                <div class="filter-group">
+                    <label class="filter-heading">Engineering Disciplines</label>
+                    <div class="stream-pill-list">
+                        <button class="stream-pill active" onclick="setSidebarStream('all', this)">All Disciplines</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Computer Science / IT', this)">CS & IT</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Mechanical Engineering', this)">Mechanical Engg</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Civil Engineering', this)">Civil Engg</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Electrical Engineering', this)">Electrical (EEE)</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Electronics & Communication', this)">Electronics (ECE)</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Chemical Engineering', this)">Chemical Engg</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Mechatronics / Robotics', this)">Mechatronics</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Any Graduate (All Streams)', this)">Any Graduate</button>
+                        <button class="stream-pill" onclick="setSidebarStream('Commerce & Finance (Graduates)', this)">Commerce & Finance</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Job Listings Stream -->
+        <section class="jobs-stream-area">
+            <div class="jobs-toolbar">
+                <div class="toolbar-stats">
+                    <span id="jobsCountBadge" class="count-pill">Loading Vacancies...</span>
+                    <span class="subtitle-text">Pan-India Graduate Opportunities</span>
+                </div>
+                <div class="toolbar-sort">
+                    <label for="sortSelect">Sort By:</label>
+                    <select id="sortSelect" onchange="triggerSearch()">
+                        <option value="newest">Newest & Urgent First</option>
+                        <option value="salary_high">Highest Salary Package</option>
+                        <option value="salary_low">Lowest Salary Package</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Job Cards Render Target -->
+            <div id="jobCardsContainer" style="display:flex; flex-direction:column; gap:1rem;">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="pagination-container" id="paginationContainer" style="display:none;">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize search on load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Read URL query parameters if present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('q')) document.getElementById('searchInput').value = urlParams.get('q');
+        if (urlParams.get('city')) document.getElementById('citySelect').value = urlParams.get('city');
+        if (urlParams.get('stream')) document.getElementById('streamSelect').value = urlParams.get('stream');
+        if (urlParams.get('work_mode')) document.getElementById('workModeSelect').value = urlParams.get('work_mode');
+        if (urlParams.get('urgent') === 'true') document.getElementById('urgentFilterToggle').checked = true;
+        if (urlParams.get('premium') === 'true') document.getElementById('premiumFilterToggle').checked = true;
+
+        loadJobsFromAPI(1);
+    });
+
+    function setSidebarStream(stream, btn) {
+        document.querySelectorAll('.stream-pill').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        document.getElementById('streamSelect').value = stream;
+        triggerSearch();
+    }
+</script>
+{% endblock %}

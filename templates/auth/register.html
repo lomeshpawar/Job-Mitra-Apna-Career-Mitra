@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account — Job Mitra{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 560px; margin: 3rem auto;">
+    <div class="glass-panel" style="padding: 2.5rem;">
+        <div style="text-align:center; margin-bottom: 2rem;">
+            <div class="logo-icon" style="margin: 0 auto 1rem auto; width:52px; height:52px; font-size:1.5rem;">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h1 style="font-size:1.65rem; font-weight:800; color:var(--text-white);">Join Job Mitra</h1>
+            <p style="font-size:0.875rem; color:var(--text-secondary); margin-top:4px;">
+                Direct connection between engineering graduates and verified recruiters across India.
+            </p>
+        </div>
+
+        <form action="{{ url_for('auth.register') }}" method="POST" id="registerForm" onsubmit="handleRegisterSubmit(event)">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Role Selector -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
+                <label style="cursor:pointer;">
+                    <input type="radio" name="role" value="candidate" checked onchange="toggleRoleFields('candidate')" style="display:none;" id="roleCandidate">
+                    <div class="glass-panel role-pill-card active" id="cardCandidate" style="padding:0.85rem; text-align:center; border:1px solid var(--primary); background:rgba(99, 102, 241, 0.1);">
+                        <i class="fa-solid fa-user-graduate text-primary" style="font-size:1.25rem;"></i>
+                        <strong style="display:block; color:#fff; font-size:0.875rem; margin-top:4px;">Candidate / Student</strong>
+                        <span style="font-size:0.72rem; color:var(--text-secondary);">Looking for entry-level roles</span>
+                    </div>
+                </label>
+
+                <label style="cursor:pointer;">
+                    <input type="radio" name="role" value="recruiter" onchange="toggleRoleFields('recruiter')" style="display:none;" id="roleRecruiter">
+                    <div class="glass-panel role-pill-card" id="cardRecruiter" style="padding:0.85rem; text-align:center; border:1px solid var(--border);">
+                        <i class="fa-solid fa-building text-secondary" style="font-size:1.25rem;"></i>
+                        <strong style="display:block; color:#fff; font-size:0.875rem; margin-top:4px;">Recruiter / Employer</strong>
+                        <span style="font-size:0.72rem; color:var(--text-secondary);">Hiring freshers & graduates</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regName"><i class="fa-solid fa-user text-primary"></i> Full Name *</label>
+                    <input type="text" id="regName" name="name" required placeholder="e.g. Aditya Sharma" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail"><i class="fa-solid fa-envelope text-primary"></i> Email Address *</label>
+                    <input type="email" id="regEmail" name="email" required placeholder="aditya@example.com" autocomplete="email">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regPhone"><i class="fa-solid fa-phone text-primary"></i> Contact Number *</label>
+                    <input type="tel" id="regPhone" name="phone" required placeholder="+91 9876543210" autocomplete="tel">
+                </div>
+                <div class="form-group" id="groupCity">
+                    <label for="regCity"><i class="fa-solid fa-location-dot text-primary"></i> Location City</label>
+                    <input type="text" id="regCity" name="city" placeholder="e.g. Bengaluru">
+                </div>
+            </div>
+
+            <!-- Candidate Specific Fields -->
+            <div id="candidateFields">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regStream"><i class="fa-solid fa-graduation-cap text-primary"></i> Degree & Stream *</label>
+                        <select id="regStream" name="stream">
+                            <option value="Computer Science / IT">Computer Science & IT</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Electronics & Communication">Electronics & Comm (ECE)</option>
+                            <option value="Chemical Engineering">Chemical Engineering</option>
+                            <option value="Mechatronics / Robotics">Mechatronics & Robotics</option>
+                            <option value="Any Graduate (All Streams)">Any Graduate (General / Ops)</option>
+                            <option value="Commerce & Finance (Graduates)">Commerce & Finance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEdu"><i class="fa-solid fa-certificate text-primary"></i> Education Level</label>
+                        <input type="text" id="regEdu" name="education" placeholder="e.g. B.Tech (2026 Batch)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recruiter Specific Fields -->
+            <div id="recruiterFields" style="display:none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regCompany"><i class="fa-regular fa-building text-secondary"></i> Company Name *</label>
+                        <input type="text" id="regCompany" name="company_name" placeholder="e.g. TechNova Software Labs">
+                    </div>
+                    <div class="form-group">
+                        <label for="regDesignation"><i class="fa-solid fa-briefcase text-secondary"></i> Designation</label>
+                        <input type="text" id="regDesignation" name="designation" placeholder="e.g. Lead Technical Recruiter">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regPassword"><i class="fa-solid fa-lock text-primary"></i> Password * (Min 8 chars)</label>
+                    <input type="password" id="regPassword" name="password" required minlength="8" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword"><i class="fa-solid fa-lock text-primary"></i> Confirm Password *</label>
+                    <input type="password" id="regConfirmPassword" name="confirm_password" required minlength="8" placeholder="••••••••" autocomplete="new-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btnRegisterSubmit" style="width:100%; margin-top:1.5rem; padding:0.75rem;">
+                <i class="fa-solid fa-user-plus"></i> Create Free Account
+            </button>
+        </form>
+
+        <div style="text-align:center; margin-top:1.5rem; font-size:0.84rem; color:var(--text-secondary);">
+            Already have an account? <a href="{{ url_for('auth.login') }}" style="color:var(--primary); font-weight:700;">Sign in here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleRoleFields(role) {
+        const candFields = document.getElementById('candidateFields');
+        const recFields = document.getElementById('recruiterFields');
+        const cardCand = document.getElementById('cardCandidate');
+        const cardRec = document.getElementById('cardRecruiter');
+
+        if (role === 'candidate') {
+            candFields.style.display = 'block';
+            recFields.style.display = 'none';
+            cardCand.style.borderColor = 'var(--primary)';
+            cardCand.style.background = 'rgba(99, 102, 241, 0.1)';
+            cardRec.style.borderColor = 'var(--border)';
+            cardRec.style.background = 'transparent';
+        } else {
+            candFields.style.display = 'none';
+            recFields.style.display = 'block';
+            cardRec.style.borderColor = 'var(--secondary)';
+            cardRec.style.background = 'rgba(139, 92, 246, 0.1)';
+            cardCand.style.borderColor = 'var(--border)';
+            cardCand.style.background = 'transparent';
+        }
+    }
+
+    function handleRegisterSubmit(e) {
+        const p1 = document.getElementById('regPassword').value;
+        const p2 = document.getElementById('regConfirmPassword').value;
+        if (p1 !== p2) {
+            e.preventDefault();
+            showToast('Passwords do not match. Please re-enter.', 'error');
+            return;
+        }
+        const btn = document.getElementById('btnRegisterSubmit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
+    }
+</script>
+{% endblock %}

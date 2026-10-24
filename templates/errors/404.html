@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}404 - Page Not Found — Job Mitra{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 4rem auto; text-align: center;">
+    <div class="glass-panel" style="padding: 3rem 2rem;">
+        <div style="font-size: 4rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem;">404</div>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.75rem;">Page or Vacancy Not Found</h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">
+            The job listing or page you requested may have been closed, expired, or relocated.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+            <a href="{{ url_for('jobs.index') }}" class="btn-secondary"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="{{ url_for('jobs.search_page') }}" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Browse Vacancies</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

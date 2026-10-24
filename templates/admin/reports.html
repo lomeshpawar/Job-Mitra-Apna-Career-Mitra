@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Fraud Reports — Admin Command{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('admin.dashboard') }}">Admin Command</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">Job Fraud Reports</span>
+    </div>
+
+    <div class="dash-header-card" style="margin-bottom:1.5rem;">
+        <div>
+            <h1>Candidate Safety & Fraud Reports</h1>
+            <p>Review reports of fraudulent listings, fee demands, or misleading recruitment activity.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem;">
+        {% if reports %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Reported Vacancy</th>
+                        <th>Reason for Report</th>
+                        <th>Details</th>
+                        <th>Reporter</th>
+                        <th>Timestamp</th>
+                        <th>Status</th>
+                        <th>Resolution Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reports %}
+                    <tr>
+                        <td>
+                            <strong style="color:#fff;">{{ r.job_title }}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">{{ r.job_company }} • Job #{{ r.job_id }}</div>
+                        </td>
+                        <td><span class="badge-urgent" style="font-size:0.75rem;">{{ r.reason }}</span></td>
+                        <td style="font-size:0.78rem; color:var(--text-secondary); max-width:250px;">{{ r.details or 'No additional details.' }}</td>
+                        <td>{{ r.reporter_email or 'Anonymous' }}</td>
+                        <td style="font-size:0.75rem; color:var(--text-muted);">{{ r.created_at }}</td>
+                        <td>
+                            <span class="badge-verified" style="{% if r.status == 'Pending' %}background:var(--warning-bg); color:var(--warning);{% elif r.status == 'Action Taken' %}background:var(--danger-bg); color:var(--danger);{% else %}background:rgba(148,163,184,0.1); color:var(--text-muted);{% endif %}">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if r.status == 'Pending' %}
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn-danger" onclick="resolveReportAction({{ r.id }}, 'take_down')" style="padding:3px 8px; font-size:0.72rem;">Take Down Job</button>
+                                <button class="btn-secondary" onclick="resolveReportAction({{ r.id }}, 'dismiss')" style="padding:3px 8px; font-size:0.72rem;">Dismiss</button>
+                            </div>
+                            {% else %}
+                            <span style="font-size:0.75rem; color:var(--text-muted);">Resolved</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+            <i class="fa-solid fa-shield-check" style="font-size:2.5rem; color:var(--success); margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Fraud Reports Pending</h4>
+            <p style="font-size:0.8125rem;">Candidate community reports will appear here for immediate review.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function resolveReportAction(reportId, action) {
+        try {
+            const res = await fetch(`/admin/api/reports/${reportId}/resolve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ action: action })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 800);
+            }
+        } catch (e) {
+            showToast('Network error resolving report', 'error');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Employer Verification Queue — Admin Command{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('admin.dashboard') }}">Admin Command</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">Employer Verification Queue</span>
+    </div>
+
+    <div class="dash-header-card" style="margin-bottom:1.5rem;">
+        <div>
+            <h1>Employer Verification Queue</h1>
+            <p>Verify legitimate company registrations and grant the verified employer trust badge.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem;">
+        {% if employers %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Employer Name</th>
+                        <th>Industry</th>
+                        <th>Location</th>
+                        <th>Website</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employers %}
+                    <tr>
+                        <td><strong style="color:#fff;">{{ emp.name }}</strong></td>
+                        <td>{{ emp.industry or 'General' }}</td>
+                        <td>{{ emp.location or 'India' }}</td>
+                        <td>
+                            {% if emp.website %}
+                            <a href="{{ emp.website }}" target="_blank" rel="noopener" style="font-size:0.75rem;">{{ emp.website }}</a>
+                            {% else %}
+                            <span style="color:var(--text-muted); font-size:0.75rem;">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if emp.is_verified %}
+                            <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                            {% else %}
+                            <span class="badge-unverified"><i class="fa-solid fa-clock"></i> Unverified</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if emp.is_verified %}
+                            <button class="btn-danger" onclick="toggleEmployerVerification({{ emp.id }}, false)" style="padding:3px 8px; font-size:0.72rem;">Revoke</button>
+                            {% else %}
+                            <button class="btn-success" onclick="toggleEmployerVerification({{ emp.id }}, true)" style="padding:3px 10px; font-size:0.75rem;">Verify Employer</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2rem; color:var(--text-muted);">No employers registered.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function toggleEmployerVerification(empId, verify) {
+        try {
+            const res = await fetch(`/admin/api/employers/${empId}/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ verify: verify })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 800);
+            }
+        } catch (e) {
+            showToast('Network error updating employer status', 'error');
+        }
+    }
+</script>
+{% endblock %}

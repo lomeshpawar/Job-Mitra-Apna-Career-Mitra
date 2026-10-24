@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a New Vacancy — Recruiter Console | Job Mitra{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 2.5rem auto;">
+    <div class="glass-panel" style="padding: 2.5rem;">
+        <div style="margin-bottom: 2rem;">
+            <span class="badge-urgent"><i class="fa-solid fa-circle-plus"></i> EMPLOYER PORTAL</span>
+            <h1 style="font-size:1.75rem; font-weight:800; color:var(--text-white); margin-top:4px;">Publish a New Vacancy</h1>
+            <p style="font-size:0.875rem; color:var(--text-secondary);">
+                Connect directly with fresh engineering graduates and IT students across India. New vacancies are reviewed by admin moderation.
+            </p>
+        </div>
+
+        <form action="{{ url_for('recruiter.post_job') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postTitle">Job Vacancy Title *</label>
+                    <input type="text" id="postTitle" name="title" required placeholder="e.g. Junior Full Stack Developer (Graduate Special)">
+                </div>
+                <div class="form-group">
+                    <label for="postCompany">Hiring Company Name *</label>
+                    <input type="text" id="postCompany" name="company" required value="{{ recruiter.company_name if recruiter else '' }}" placeholder="e.g. TechNova Software Labs">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postStream">Target Engineering / Graduate Stream *</label>
+                    <select id="postStream" name="stream" required>
+                        <option value="Computer Science / IT">Computer Science & IT</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Electrical Engineering">Electrical Engineering (EEE)</option>
+                        <option value="Electronics & Communication">Electronics & Comm (ECE)</option>
+                        <option value="Chemical Engineering">Chemical Engineering</option>
+                        <option value="Mechatronics / Robotics">Mechatronics & Robotics</option>
+                        <option value="Instrumentation & Control">Instrumentation & Control</option>
+                        <option value="Biotechnology / Biomedical">Biotechnology & Biomedical</option>
+                        <option value="Any Graduate (All Streams)">Any Graduate (All Streams)</option>
+                        <option value="Commerce & Finance (Graduates)">Commerce & Finance</option>
+                        <option value="Any Graduate / Media / BBA">Digital Marketing & Media</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="postQual">Required Degree / Qualification *</label>
+                    <input type="text" id="postQual" name="qualification" required placeholder="e.g. B.Tech / B.E. / BCA / MCA">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postCity">City Location *</label>
+                    <select id="postCity" name="city" required>
+                        <option value="Bengaluru">Bengaluru</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Delhi NCR">Delhi NCR / Noida / Gurugram</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Ahmedabad">Ahmedabad</option>
+                        <option value="Vadodara">Vadodara</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="postWorkMode">Work Mode *</label>
+                    <select id="postWorkMode" name="work_mode" required>
+                        <option value="Onsite">Onsite</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Remote">100% Remote</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postSalMin">Minimum Monthly Salary (₹) *</label>
+                    <input type="number" id="postSalMin" name="salary_min" required value="25000" min="10000" step="1000">
+                </div>
+                <div class="form-group">
+                    <label for="postSalMax">Maximum Monthly Salary (₹) *</label>
+                    <input type="number" id="postSalMax" name="salary_max" required value="40000" min="15000" step="1000">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postExp">Experience Level *</label>
+                    <select id="postExp" name="experience" required>
+                        <option value="Freshers / 0-1 yr">Freshers (0 - 1 yr)</option>
+                        <option value="Freshers / 0-2 yrs">Freshers / Entry (0 - 2 yrs)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="postJobType">Job Type *</label>
+                    <select id="postJobType" name="job_type" required>
+                        <option value="Full Time">Full Time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Contract">Contract</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="postSkills">Required Technical Skills (Comma Separated) *</label>
+                <input type="text" id="postSkills" name="skills_required" required placeholder="e.g. Python, Flask, SQL, HTML, CSS, Git">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Used by Job Mitra to compute transparent match scores for students.</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="postHrEmail">HR Contact Email *</label>
+                    <input type="email" id="postHrEmail" name="hr_email" required value="{{ current_user.email }}">
+                </div>
+                <div class="form-group">
+                    <label for="postHrPhone">HR Calling Phone Line *</label>
+                    <input type="tel" id="postHrPhone" name="hr_phone" required placeholder="+91 9876543210">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="postAddress">Office / Plant Address</label>
+                <input type="text" id="postAddress" name="address" placeholder="e.g. Electronic City Phase 1, Bengaluru">
+            </div>
+
+            <div class="form-group">
+                <label for="postDesc">Comprehensive Role Description & Requirements *</label>
+                <textarea id="postDesc" name="description" rows="5" required placeholder="Describe day-to-day responsibilities, training programs, interview rounds, and perks..."></textarea>
+            </div>
+
+            <div style="display:flex; gap:1.5rem; margin:1rem 0;">
+                <label class="toggle-container">
+                    <input type="checkbox" name="is_urgent" value="1" checked>
+                    <span><i class="fa-solid fa-bolt text-danger"></i> Mark as Urgent Hiring</span>
+                </label>
+                <label class="toggle-container">
+                    <input type="checkbox" name="is_premium" value="1">
+                    <span><i class="fa-solid fa-crown text-gold"></i> Highlight as Pro Priority Vacancy</span>
+                </label>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem;">
+                <a href="{{ url_for('recruiter.dashboard') }}" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-primary" style="padding:0.65rem 1.5rem;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Vacancy for Review
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

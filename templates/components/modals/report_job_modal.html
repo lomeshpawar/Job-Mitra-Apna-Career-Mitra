@@ -1,0 +1,55 @@
+<!-- Report Suspicious Job Modal -->
+<div class="modal-overlay" id="reportJobModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <div>
+                <span class="badge-urgent"><i class="fa-solid fa-triangle-exclamation"></i> SAFETY REPORT</span>
+                <h3 id="reportModalTitle" style="color:#fff; margin-top:4px; font-size:1.15rem;">Report Suspicious Vacancy</h3>
+                <p id="reportModalCompany" style="color:var(--text-secondary); font-size:0.84rem;">Company</p>
+            </div>
+            <button class="modal-close" onclick="closeReportJobModal()" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            {% if is_logged_in %}
+            <form id="reportJobForm" onsubmit="handleReportJobSubmit(event)">
+                <input type="hidden" id="reportJobId">
+                <div class="form-group">
+                    <label for="reportReason"><i class="fa-solid fa-circle-exclamation text-danger"></i> Reason for Report *</label>
+                    <select id="reportReason" required>
+                        <option value="">Select a violation...</option>
+                        <option value="Demanding Application / Security Fee">Demanding Application / Security Fee (Scam)</option>
+                        <option value="Fake / Fabricated Company Identity">Fake / Fabricated Company Identity</option>
+                        <option value="Inaccurate Salary or Responsibilities">Inaccurate Salary or Responsibilities</option>
+                        <option value="Suspicious Contact Details">Suspicious Contact Details</option>
+                        <option value="Other Policy Violation">Other Policy Violation</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportDetails"><i class="fa-solid fa-pen-clip text-primary"></i> Supporting Details (Optional)</label>
+                    <textarea id="reportDetails" rows="4" placeholder="Provide any additional details or evidence to help our admin team investigate promptly..."></textarea>
+                </div>
+
+                <div class="modal-footer" style="padding:0; margin-top:1rem; border:none;">
+                    <button type="button" class="btn-secondary" onclick="closeReportJobModal()">Cancel</button>
+                    <button type="submit" class="btn-danger" id="btnSubmitReport">
+                        <i class="fa-solid fa-shield-halved"></i> Submit Report to Moderation
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div style="text-align:center; padding:1.5rem 0;">
+                <i class="fa-solid fa-shield-halved" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:1rem;"></i>
+                <h3 style="color:#fff; margin-bottom:0.5rem;">Sign In to Submit Report</h3>
+                <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:1.5rem;">
+                    To prevent abuse, users must be logged in to report job listings.
+                </p>
+                <div style="display:flex; justify-content:center; gap:0.75rem;">
+                    <a href="{{ url_for('auth.login') }}" class="btn-secondary">Sign In</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn-primary">Register Free</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

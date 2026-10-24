@@ -1,0 +1,96 @@
+<!-- Job Mitra Pro Subscription Modal with Audited State Machine -->
+<div class="modal-overlay" id="subscriptionModal">
+    <div class="modal-dialog modal-large">
+        <div class="modal-header" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);">
+            <div>
+                <span class="badge-gold-star"><i class="fa-solid fa-crown text-gold"></i> JOB MITRA PRO PASS</span>
+                <h2 style="font-size:1.35rem; color:var(--text-white); margin-top:4px;">Upgrade to Job Mitra Pro</h2>
+                <p style="font-size:0.8125rem; color:var(--text-secondary);">Direct HR phone lines, application priority, and transparent skill breakdown via audited UPI verification.</p>
+            </div>
+            <button class="modal-close" onclick="closeSubscriptionModal()" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <!-- Notice Banner on Payment Verification Mode -->
+            <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 0.8125rem; color: var(--text-secondary);">
+                <i class="fa-solid fa-shield-halved text-primary"></i> <strong>Audited Payment State Machine:</strong>
+                All reference submissions enter state <code>PENDING</code>. In local development / demo mode, our administrator moderation console verifies your UTR before transitioning status to <code>ACTIVE</code>. No fake or unverified instant activations!
+            </div>
+
+            <!-- Pricing Plans Selection Grid -->
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.5rem;" id="plansGrid">
+                <div class="glass-panel plan-selection-card" style="padding:1rem; cursor:pointer;" onclick="selectSubscriptionPlan('Starter Boost', 99, this)">
+                    <span style="font-size:0.7rem; font-weight:800; color:#94A3B8; text-transform:uppercase;">Starter</span>
+                    <h4 style="color:#fff; font-size:1rem; margin:2px 0;">Starter Boost</h4>
+                    <div style="font-size:1.35rem; font-weight:800; color:var(--gold);">₹99 <span style="font-size:0.75rem; color:var(--text-muted);">/ 30 Days</span></div>
+                    <ul style="font-size:0.75rem; color:var(--text-secondary); list-style:none; margin-top:0.5rem; display:flex; flex-direction:column; gap:4px;">
+                        <li><i class="fa-solid fa-check text-success"></i> Direct HR Call Unlock</li>
+                        <li><i class="fa-solid fa-check text-success"></i> 15 Fast-Track Applications</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Candidate Pro Badge</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel plan-selection-card active" style="padding:1rem; cursor:pointer; border-color:var(--gold); background:rgba(251, 191, 36, 0.05);" onclick="selectSubscriptionPlan('Graduate Career Pro', 199, this)">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.7rem; font-weight:800; color:var(--gold); text-transform:uppercase;">Most Popular</span>
+                        <i class="fa-solid fa-star text-gold" style="font-size:0.75rem;"></i>
+                    </div>
+                    <h4 style="color:#fff; font-size:1rem; margin:2px 0;">Graduate Pro</h4>
+                    <div style="font-size:1.35rem; font-weight:800; color:var(--gold);">₹199 <span style="font-size:0.75rem; color:var(--text-muted);">/ 180 Days</span></div>
+                    <ul style="font-size:0.75rem; color:var(--text-secondary); list-style:none; margin-top:0.5rem; display:flex; flex-direction:column; gap:4px;">
+                        <li><i class="fa-solid fa-check text-success"></i> <strong>Unlimited</strong> HR Calls & Mails</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Top 1% Application Ranking</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Transparent Skill Engine</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Instant WhatsApp Alerts</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel plan-selection-card" style="padding:1rem; cursor:pointer;" onclick="selectSubscriptionPlan('Lifetime Placement Pass', 499, this)">
+                    <span style="font-size:0.7rem; font-weight:800; color:#A78BFA; text-transform:uppercase;">Best Value</span>
+                    <h4 style="color:#fff; font-size:1rem; margin:2px 0;">Lifetime Pass</h4>
+                    <div style="font-size:1.35rem; font-weight:800; color:var(--gold);">₹499 <span style="font-size:0.75rem; color:var(--text-muted);">/ 10 Years</span></div>
+                    <ul style="font-size:0.75rem; color:var(--text-secondary); list-style:none; margin-top:0.5rem; display:flex; flex-direction:column; gap:4px;">
+                        <li><i class="fa-solid fa-check text-success"></i> Permanent Pro Status</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Exclusive MNC Direct Pool</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Career Counselor Support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- UPI Payment Box -->
+            <div style="display:grid; grid-template-columns: 200px 1fr; gap:1.25rem; align-items:center; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-top:0.5rem;">
+                <div style="text-align:center;">
+                    <img id="upiQrCodeImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa={{ app_upi_id }}%26pn=Job%20Mitra%26cu=INR%26am=199" alt="Job Mitra UPI QR Code" style="width:160px; height:160px; border-radius:var(--radius-sm); border:2px solid #fff; background:#fff; padding:4px;">
+                    <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">GPay • PhonePe • Paytm • BHIM</div>
+                </div>
+
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); padding:0.5rem 0.75rem; border-radius:var(--radius-sm); border:1px solid var(--border);">
+                        <div>
+                            <span style="font-size:0.72rem; color:var(--text-muted); display:block;">Official Job Mitra UPI ID:</span>
+                            <strong id="officialUpiIdStr" style="font-family:monospace; color:var(--gold); font-size:0.95rem;">{{ app_upi_id }}</strong>
+                        </div>
+                        <button type="button" class="btn-outline" onclick="copyUpiIdToClipboard()" style="padding:0.3rem 0.65rem; font-size:0.75rem;">
+                            <i class="fa-regular fa-copy"></i> <span id="copyUpiText">Copy UPI</span>
+                        </button>
+                    </div>
+
+                    <!-- UTR Submission Form -->
+                    <form id="proActivationForm" onsubmit="handleProActivationSubmit(event)" style="margin-top:0.85rem;">
+                        <input type="hidden" id="selectedPlanName" value="Graduate Career Pro">
+                        <input type="hidden" id="selectedPlanAmount" value="199">
+                        <div class="form-group" style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.8125rem; font-weight:700;">
+                                <i class="fa-solid fa-receipt text-primary"></i> 12-Digit UPI Transaction / UTR Reference ID *
+                            </label>
+                            <input type="text" id="upiUtrInput" required placeholder="e.g. 428719284729 or Bank Ref" style="font-family:monospace; letter-spacing:1px; font-weight:700;">
+                            <span style="font-size:0.7rem; color:var(--text-muted);">Must be unique. Recorded as <code>PENDING</code> in our audit ledger.</span>
+                        </div>
+                        <button type="submit" class="btn-primary" id="btnSubmitUtr" style="width:100%; margin-top:0.4rem;">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Reference for Verification
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

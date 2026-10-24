@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} at {{ job.company }} — Job Mitra{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto; max-width: 960px;">
+    <!-- Breadcrumb -->
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('jobs.index') }}">Home</a>
+        <span>/</span>
+        <a href="{{ url_for('jobs.search_page') }}">Vacancies</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">{{ job.title }}</span>
+    </div>
+
+    <!-- Demo Record Notice Banner -->
+    {% if job.is_demo %}
+    <div style="background: rgba(148, 163, 184, 0.08); border: 1px dashed rgba(148, 163, 184, 0.35); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px;">
+        <i class="fa-solid fa-flask text-secondary" style="font-size:1.35rem; margin-top:2px;"></i>
+        <div>
+            <strong style="color:var(--text-white); font-size:0.875rem;">Sample Demonstration Record</strong>
+            <p style="font-size:0.8125rem; color:var(--text-secondary); margin-top:2px;">
+                This vacancy is a curated demonstration listing provided for freshers to evaluate portal workflows and application mechanics. Real recruitment contacts are only published for verified registered employers.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Detail Glass Card -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; border-bottom:1px solid var(--border); padding-bottom:1.5rem;">
+            <div>
+                <div class="card-badges-row" style="margin-bottom:8px;">
+                    <span class="stream-badge"><i class="fa-solid fa-graduation-cap"></i> {{ job.stream }}</span>
+                    {% if job.is_urgent %}
+                    <span class="urgent-badge"><i class="fa-solid fa-bolt"></i> Urgent Hiring</span>
+                    {% endif %}
+                    {% if job.is_premium %}
+                    <span class="badge-gold-star"><i class="fa-solid fa-crown text-gold"></i> Pro Priority</span>
+                    {% endif %}
+                </div>
+                <h1 style="font-size:1.85rem; font-weight:800; color:var(--text-white); line-height:1.2;">{{ job.title }}</h1>
+                <div class="company-line" style="margin-top:6px; font-size:1rem;">
+                    <span><i class="fa-regular fa-building text-primary"></i> <strong>{{ job.company }}</strong></span>
+                    {% if job.is_verified and not job.is_demo %}
+                    <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Employer</span>
+                    {% elif job.is_demo %}
+                    <span class="badge-unverified"><i class="fa-solid fa-circle-info"></i> Demo Employer Data</span>
+                    {% else %}
+                    <span class="badge-unverified"><i class="fa-regular fa-circle"></i> Verification Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+                <button class="btn-icon-action {% if is_bookmarked %}active{% endif %}" onclick="toggleJobBookmark({{ job.id }}, this)" title="Save Job">
+                    <i class="{% if is_bookmarked %}fa-solid text-gold{% else %}fa-regular{% endif %} fa-bookmark"></i>
+                </button>
+                <button class="btn-outline" onclick="openReportJobModal({{ job.id }}, '{{ job.title|escape }}', '{{ job.company|escape }}')" style="color:var(--text-muted); font-size:0.75rem;">
+                    <i class="fa-solid fa-flag"></i> Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Key Specifications Grid -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem; padding:1.5rem 0; border-bottom:1px solid var(--border);">
+            <div>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Monthly Compensation</span>
+                <div style="font-size:1.15rem; font-weight:800; color:#4ADE80; margin-top:2px;">
+                    ₹{{ "{:,}".format(job.salary_min) }} - ₹{{ "{:,}".format(job.salary_max) }}
+                </div>
+            </div>
+
+            <div>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Location & Mode</span>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-top:2px;">
+                    {{ job.city }} ({{ job.work_mode or 'Onsite' }})
+                </div>
+            </div>
+
+            <div>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Experience Required</span>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-top:2px;">
+                    {{ job.experience }}
+                </div>
+            </div>
+
+            <div>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Target Batches</span>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-top:2px;">
+                    {{ job.graduation_year or '2025, 2026 Batch' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Transparent Match Breakdown (If candidate profile is evaluated) -->
+        {% if match_info %}
+        <div style="background:rgba(99, 102, 241, 0.08); border:1px solid rgba(99, 102, 241, 0.2); border-radius:var(--radius-sm); padding:1rem; margin:1.5rem 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.84rem; font-weight:700; color:#A5B4FC;">
+                    <i class="fa-solid fa-bullseye"></i> Transparent Match Score: {{ match_info.score }}%
+                </span>
+                <span style="font-size:0.72rem; color:var(--text-muted);">Calculated using verified profile criteria</span>
+            </div>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:4px; font-size:0.8125rem; color:var(--text-secondary);">
+                {% for reason in match_info.reasons %}
+                <li><i class="fa-solid fa-check text-success" style="font-size:0.75rem;"></i> {{ reason }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Required Skills -->
+        <div style="margin: 1.5rem 0;">
+            <h3 style="font-size:1rem; font-weight:700; color:var(--text-white); margin-bottom:0.75rem;">Required Technical Skills</h3>
+            <div class="job-skills-bar">
+                {% for sk in job.skills_required.split(',') %}
+                    {% if sk.strip() %}
+                    <span class="skill-tag" style="font-size:0.84rem; padding:4px 12px;">{{ sk.strip() }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Full Job Description & Responsibilities -->
+        <div style="margin: 1.5rem 0;">
+            <h3 style="font-size:1rem; font-weight:700; color:var(--text-white); margin-bottom:0.75rem;">Role Overview & Responsibilities</h3>
+            <div style="font-size:0.9rem; color:var(--text-secondary); line-height:1.7; white-space:pre-line;">
+                {{ job.description }}
+            </div>
+        </div>
+
+        <!-- Eligibility Specifications -->
+        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin:1.5rem 0; font-size:0.84rem;">
+            <h4 style="color:#fff; font-size:0.9rem; margin-bottom:0.5rem;"><i class="fa-solid fa-certificate text-primary"></i> Academic & Stream Eligibility</h4>
+            <p><strong>Required Qualification:</strong> {{ job.qualification }}</p>
+            <p><strong>Academic Stream:</strong> {{ job.stream }}</p>
+            <p><strong>Work Address:</strong> {{ job.address }}</p>
+            <p><strong>Posted On:</strong> {{ job.created_at }}</p>
+        </div>
+
+        <!-- HR Recruiter Contact Box -->
+        <div style="background:rgba(17,24,39,0.9); border:1px solid var(--border-light); border-radius:var(--radius); padding:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Direct Recruiter Contact</span>
+                <div style="display:flex; align-items:center; gap:1rem; margin-top:4px; font-size:0.875rem;">
+                    <span><i class="fa-solid fa-envelope text-primary"></i> {{ job.hr_email }}</span>
+                    <span><i class="fa-solid fa-phone text-warning"></i> {{ job.hr_phone }}</span>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                {% if has_applied %}
+                <button class="btn-apply-quick applied" disabled><i class="fa-solid fa-circle-check"></i> Applied to HR</button>
+                {% else %}
+                <button class="btn-primary" onclick="openApplyModal({{ job.id }}, '{{ job.title|escape }}', '{{ job.company|escape }}')">
+                    <i class="fa-solid fa-bolt"></i> 1-Click Apply
+                </button>
+                {% endif %}
+                <button class="btn-secondary" onclick="openSendMailModal({{ job.id }}, '{{ job.title|escape }}', '{{ job.company|escape }}', '{{ job.hr_email|escape }}', '{{ job.hr_phone|escape }}')">
+                    <i class="fa-regular fa-envelope"></i> Send Mail to HR
+                </button>
+                <a href="tel:{{ job.hr_phone }}" class="btn-outline">
+                    <i class="fa-solid fa-phone"></i> Call HR
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

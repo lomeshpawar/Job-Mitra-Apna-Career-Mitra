@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}Job Mitra — Apna Career Mitra | Fresher & Graduate IT Job Portal{% endblock %}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Announcement Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-inner">
+            <div class="top-bar-left">
+                <span class="badge-urgent"><i class="fa-solid fa-handshake"></i> JOB MITRA</span>
+                <span>Apna Career Mitra • Direct HR Hiring for Freshers & 2026 Batch • Zero Placement Fees</span>
+            </div>
+            <div class="top-bar-right">
+                <span class="top-upi-pill" onclick="openSubscriptionModal()">
+                    <i class="fa-solid fa-bolt text-gold"></i> Pro UPI: <strong>{{ app_upi_id }}</strong>
+                </span>
+                <span class="divider">|</span>
+                <span id="currentDateStr"><i class="fa-regular fa-calendar-days"></i> October 2026</span>
+                {% if is_logged_in and current_user.role == 'candidate' %}
+                <span class="divider">|</span>
+                <span class="top-upi-pill" onclick="openSubscriptionModal()" style="cursor:pointer;">
+                    {% if current_user.is_premium %}
+                    <i class="fa-solid fa-crown text-gold"></i> <strong style="color:var(--gold);">Pro Active</strong>
+                    {% else %}
+                    <i class="fa-solid fa-crown"></i> <span>Upgrade to Pro</span>
+                    {% endif %}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="main-header">
+        <div class="container header-container">
+            <a href="{{ url_for('jobs.index') }}" class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">Job <span class="logo-highlight">Mitra</span></span>
+                    <span class="logo-sub"><i class="fa-solid fa-shield-halved text-success"></i> Apna Career Mitra</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links" id="mainNavLinks">
+                <a href="{{ url_for('jobs.search_page') }}" class="nav-link {% if request.endpoint == 'jobs.search_page' %}active{% endif %}">
+                    <i class="fa-solid fa-magnifying-glass"></i> Find Vacancies
+                </a>
+                {% if is_logged_in %}
+                    {% if current_user.role == 'candidate' %}
+                    <a href="{{ url_for('candidate.dashboard') }}" class="nav-link {% if request.endpoint == 'candidate.dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-pie"></i> Candidate Dashboard
+                    </a>
+                    {% elif current_user.role == 'recruiter' %}
+                    <a href="{{ url_for('recruiter.dashboard') }}" class="nav-link {% if request.endpoint == 'recruiter.dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-briefcase"></i> Recruiter Console
+                    </a>
+                    <a href="{{ url_for('recruiter.post_job') }}" class="nav-link {% if request.endpoint == 'recruiter.post_job' %}active{% endif %}">
+                        <i class="fa-solid fa-circle-plus"></i> Post Job
+                    </a>
+                    {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-gauge-high"></i> Admin Command
+                    </a>
+                    <a href="{{ url_for('admin.moderation_queue') }}" class="nav-link {% if request.endpoint == 'admin.moderation_queue' %}active{% endif %}">
+                        <i class="fa-solid fa-list-check"></i> Moderation
+                    </a>
+                    <a href="{{ url_for('admin.payments_audit') }}" class="nav-link {% if request.endpoint == 'admin.payments_audit' %}active{% endif %}">
+                        <i class="fa-solid fa-receipt"></i> Payments
+                    </a>
+                    {% endif %}
+                {% endif %}
+            </nav>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <button class="btn-pro-subscription" onclick="openSubscriptionModal()">
+                    <i class="fa-solid fa-crown"></i> <span>Get Pro Pass</span>
+                    <span class="badge-discount">₹99</span>
+                </button>
+
+                {% if is_logged_in %}
+                <div class="user-menu-pill" id="userMenuDropdownBtn" onclick="toggleUserDropdown(event)">
+                    <div class="profile-pill">
+                        <div class="avatar-circle">
+                            {{ current_user.name[:2].upper() if current_user.name else 'JM' }}
+                        </div>
+                        <div class="avatar-info">
+                            <span class="profile-name">{{ current_user.name }}</span>
+                            <span class="profile-role">{{ current_user.role }}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" style="font-size:0.7rem; color:var(--text-muted); margin-left:4px;"></i>
+                    </div>
+
+                    <!-- Dropdown Menu -->
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        {% if current_user.role == 'candidate' %}
+                        <a href="{{ url_for('candidate.dashboard') }}"><i class="fa-solid fa-chart-pie"></i> My Dashboard</a>
+                        <a href="{{ url_for('candidate.dashboard') }}#applications"><i class="fa-solid fa-paper-plane"></i> My Applications</a>
+                        <a href="{{ url_for('candidate.dashboard') }}#saved"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
+                        {% elif current_user.role == 'recruiter' %}
+                        <a href="{{ url_for('recruiter.dashboard') }}"><i class="fa-solid fa-briefcase"></i> Recruiter Console</a>
+                        <a href="{{ url_for('recruiter.post_job') }}"><i class="fa-solid fa-circle-plus"></i> Post Vacancy</a>
+                        {% elif current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+                        <a href="{{ url_for('admin.moderation_queue') }}"><i class="fa-solid fa-shield-halved"></i> Moderation Queue</a>
+                        <a href="{{ url_for('admin.payments_audit') }}"><i class="fa-solid fa-receipt"></i> Payment Audit</a>
+                        <a href="{{ url_for('admin.view_audit_logs') }}"><i class="fa-solid fa-file-shield"></i> Security Audit Logs</a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('auth.logout') }}" style="color:var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-secondary">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn-primary">
+                    <i class="fa-solid fa-user-plus"></i> Get Started
+                </a>
+                {% endif %}
+
+                <!-- Mobile Menu Hamburger -->
+                <button class="mobile-nav-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="container" style="margin-top: 1rem;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="toast {{ category }}" style="position:static; margin-bottom:0.75rem; pointer-events:auto;">
+                    <i class="fa-solid {% if category == 'success' %}fa-circle-check text-success{% elif category == 'error' %}fa-triangle-exclamation text-danger{% else %}fa-circle-info text-primary{% endif %}"></i>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main style="flex: 1;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modals -->
+    {% include 'components/modals/subscription_modal.html' %}
+    {% include 'components/modals/apply_modal.html' %}
+    {% include 'components/modals/send_mail_modal.html' %}
+    {% include 'components/modals/report_job_modal.html' %}
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Trustworthy Modern SaaS Footer -->
+    <footer class="main-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                    <span class="logo-title text-white">Job <span class="logo-highlight">Mitra</span></span>
+                </div>
+                <p>Empowering fresh engineering graduates, BCA/MCA students, and IT job seekers across India with 100% free direct HR opportunities. Built on transparent matching with zero middleman charges.</p>
+                <div class="top-upi-pill" onclick="openSubscriptionModal()" style="display:inline-block; cursor:pointer;">
+                    <i class="fa-solid fa-qrcode text-gold"></i> Pro Pass UPI: <strong>{{ app_upi_id }}</strong>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>Engineering & Streams</h4>
+                <ul>
+                    <li><a href="{{ url_for('jobs.search_page', stream='Computer Science / IT') }}">Computer Science & IT</a></li>
+                    <li><a href="{{ url_for('jobs.search_page', stream='Mechanical Engineering') }}">Mechanical Engineering</a></li>
+                    <li><a href="{{ url_for('jobs.search_page', stream='Civil Engineering') }}">Civil & Structural</a></li>
+                    <li><a href="{{ url_for('jobs.search_page', stream='Electrical Engineering') }}">Electrical & Electronics</a></li>
+                    <li><a href="{{ url_for('jobs.search_page', stream='Chemical Engineering') }}">Chemical & Process</a></li>
+                    <li><a href="{{ url_for('jobs.search_page', stream='Any Graduate (All Streams)') }}">Any Graduate / Operations</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Platform Navigation</h4>
+                <ul>
+                    <li><a href="{{ url_for('jobs.search_page') }}">Browse All Vacancies</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">Candidate Login</a></li>
+                    <li><a href="{{ url_for('auth.register', role='recruiter') }}">Employer Registration</a></li>
+                    <li><a href="javascript:void(0)" onclick="openSubscriptionModal()">Job Mitra Pro Membership</a></li>
+                    <li><a href="{{ url_for('jobs.index') }}#how-it-works">How Direct Hiring Works</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Safety & Trust</h4>
+                <p style="font-size:0.8125rem; color:var(--text-secondary); margin-bottom:0.5rem;">
+                    <i class="fa-solid fa-shield-halved text-success"></i> <strong>Anti-Fraud Guarantee:</strong> Real companies only. Never pay for job interview calls or offer letters.
+                </p>
+                <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.5;">
+                    Job listings marked as <em>Sample / Demo Record</em> are provided for simulation. Pro UPI subscriptions are tracked via an audited state machine.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 Job Mitra (Apna Career Mitra). All rights reserved. Built with Python Flask, SQLite/MySQL, HTML5, CSS3, & Modern JavaScript.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core App Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

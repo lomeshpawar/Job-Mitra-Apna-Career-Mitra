@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Recruiter Console — Job Mitra{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <!-- Header -->
+    <div class="dash-header-card">
+        <div class="dash-header-left">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <h1>Recruiter Console</h1>
+                {% if recruiter and recruiter.is_verified %}
+                <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Employer</span>
+                {% else %}
+                <span class="badge-unverified"><i class="fa-solid fa-clock"></i> Verification Pending</span>
+                {% endif %}
+            </div>
+            <p>{{ recruiter.company_name if recruiter else 'My Company' }} • {{ recruiter.designation if recruiter else 'Recruiter' }} ({{ current_user.email }})</p>
+        </div>
+
+        <div style="display:flex; gap:0.75rem;">
+            <a href="{{ url_for('recruiter.post_job') }}" class="btn-primary">
+                <i class="fa-solid fa-plus-circle"></i> Post New Vacancy
+            </a>
+        </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid" style="margin: 1.5rem 0;">
+        <div class="metric-card card-blue">
+            <div class="metric-icon"><i class="fa-solid fa-briefcase"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ total_posted }}</span>
+                <span class="metric-label">Total Postings</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-green">
+            <div class="metric-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ published_count }}</span>
+                <span class="metric-label">Published Live</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-gold">
+            <div class="metric-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ pending_count }}</span>
+                <span class="metric-label">Pending Admin Review</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-purple">
+            <div class="metric-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="metric-data">
+                <span class="metric-value">{{ total_apps }}</span>
+                <span class="metric-label">Total Applicant Submissions</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recruiter Postings Table -->
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
+            <div>
+                <h3 style="font-size:1.15rem; font-weight:700; color:#fff;">
+                    <i class="fa-solid fa-list text-primary"></i> Your Job Postings
+                </h3>
+                <p style="font-size:0.8125rem; color:var(--text-secondary);">Manage vacancy statuses and review submitted candidate resumes.</p>
+            </div>
+            <a href="{{ url_for('recruiter.post_job') }}" class="btn-outline" style="font-size:0.8125rem;">+ Create Vacancy</a>
+        </div>
+
+        {% if jobs %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Stream / Discipline</th>
+                        <th>City</th>
+                        <th>Compensation</th>
+                        <th>Status</th>
+                        <th>Verified Badge</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td>
+                            <strong style="color:#fff;">{{ job.title }}</strong>
+                            <div style="font-size:0.72rem; color:var(--text-muted);">ID: #{{ job.id }} • {{ job.job_type }}</div>
+                        </td>
+                        <td>{{ job.stream }}</td>
+                        <td>{{ job.city }} ({{ job.work_mode or 'Onsite' }})</td>
+                        <td><span style="color:#4ADE80; font-weight:700;">₹{{ "{:,}".format(job.salary_min) }} - ₹{{ "{:,}".format(job.salary_max) }}</span></td>
+                        <td>
+                            <span class="badge-verified" style="{% if job.status == 'Published' %}background:var(--success-bg); color:var(--success);{% elif job.status == 'Pending Review' %}background:var(--warning-bg); color:var(--warning);{% elif job.status == 'Rejected' %}background:var(--danger-bg); color:var(--danger);{% else %}background:rgba(148,163,184,0.1); color:var(--text-secondary);{% endif %}">
+                                {{ job.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if job.is_verified and not job.is_demo %}
+                            <span class="badge-verified"><i class="fa-solid fa-shield-halved"></i> Verified</span>
+                            {% elif job.is_demo %}
+                            <span class="demo-badge">Demo Record</span>
+                            {% else %}
+                            <span class="badge-unverified">Under Review</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <a href="{{ url_for('recruiter.view_applicants', job_id=job.id) }}" class="btn-primary" style="padding:3px 10px; font-size:0.75rem;">
+                                    <i class="fa-solid fa-users"></i> Applicants
+                                </a>
+                                <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="btn-outline" style="padding:3px 8px; font-size:0.75rem;">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2.5rem; background:rgba(0,0,0,0.15); border-radius:var(--radius-sm);">
+            <i class="fa-solid fa-briefcase" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Job Vacancies Posted Yet</h4>
+            <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:1rem;">Post your first entry-level vacancy to start receiving verified fresher applications.</p>
+            <a href="{{ url_for('recruiter.post_job') }}" class="btn-primary">+ Post Vacancy Now</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

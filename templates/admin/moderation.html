@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Moderation Queue — Admin Command{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <!-- Breadcrumb -->
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('admin.dashboard') }}">Admin Command</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">Job Moderation Queue</span>
+    </div>
+
+    <div class="dash-header-card" style="margin-bottom:1.5rem;">
+        <div>
+            <h1>Job Moderation Queue</h1>
+            <p>Review recruiter job listings before public display. Enforce quality, salary, and company credibility standards.</p>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+            <a href="{{ url_for('admin.moderation_queue', status='Pending Review') }}" class="btn-outline {% if current_status == 'Pending Review' %}active{% endif %}">Pending Review</a>
+            <a href="{{ url_for('admin.moderation_queue', status='Published') }}" class="btn-outline {% if current_status == 'Published' %}active{% endif %}">Published</a>
+            <a href="{{ url_for('admin.moderation_queue', status='Rejected') }}" class="btn-outline {% if current_status == 'Rejected' %}active{% endif %}">Rejected</a>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem;">
+        {% if jobs %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Job Vacancy</th>
+                        <th>Recruiter & Company</th>
+                        <th>Discipline</th>
+                        <th>Salary</th>
+                        <th>Status</th>
+                        <th>Verified</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td>
+                            <strong style="color:#fff;">{{ job.title }}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">{{ job.city }} ({{ job.work_mode or 'Onsite' }}) • ID: #{{ job.id }}</div>
+                        </td>
+                        <td>
+                            <div>{{ job.company }}</div>
+                            <div style="font-size:0.72rem; color:var(--text-muted);">By: {{ job.recruiter_name or 'Recruiter' }}</div>
+                        </td>
+                        <td>{{ job.stream }}</td>
+                        <td><span style="color:#4ADE80; font-weight:700;">₹{{ "{:,}".format(job.salary_min) }} - ₹{{ "{:,}".format(job.salary_max) }}</span></td>
+                        <td>
+                            <span class="badge-verified" style="{% if job.status == 'Published' %}background:var(--success-bg); color:var(--success);{% elif job.status == 'Pending Review' %}background:var(--warning-bg); color:var(--warning);{% else %}background:var(--danger-bg); color:var(--danger);{% endif %}">
+                                {{ job.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if job.is_verified and not job.is_demo %}
+                            <span class="badge-verified">Verified</span>
+                            {% elif job.is_demo %}
+                            <span class="demo-badge">Demo</span>
+                            {% else %}
+                            <span class="badge-unverified">Unverified</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                {% if job.status != 'Published' %}
+                                <button class="btn-success" onclick="moderateJobAction({{ job.id }}, 'approve')" style="padding:3px 8px; font-size:0.72rem;">Approve</button>
+                                {% endif %}
+                                {% if job.status != 'Rejected' %}
+                                <button class="btn-danger" onclick="moderateJobAction({{ job.id }}, 'reject')" style="padding:3px 8px; font-size:0.72rem;">Reject</button>
+                                {% endif %}
+                                {% if job.is_verified %}
+                                <button class="btn-outline" onclick="moderateJobAction({{ job.id }}, 'unverify')" style="padding:3px 6px; font-size:0.72rem;" title="Remove Verified Badge"><i class="fa-solid fa-shield"></i></button>
+                                {% else %}
+                                <button class="btn-outline" onclick="moderateJobAction({{ job.id }}, 'verify')" style="padding:3px 6px; font-size:0.72rem;" title="Grant Verified Badge"><i class="fa-solid fa-shield-halved text-success"></i></button>
+                                {% endif %}
+                                <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="btn-outline" style="padding:3px 6px; font-size:0.72rem;"><i class="fa-solid fa-eye"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+            <i class="fa-solid fa-clipboard-check" style="font-size:2.5rem; margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Vacancies in "{{ current_status }}"</h4>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function moderateJobAction(jobId, action) {
+        try {
+            const res = await fetch(`/admin/api/jobs/${jobId}/moderate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ action: action })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                showToast(data.error || 'Moderation action failed', 'error');
+            }
+        } catch (e) {
+            showToast('Network error in moderation', 'error');
+        }
+    }
+</script>
+{% endblock %}

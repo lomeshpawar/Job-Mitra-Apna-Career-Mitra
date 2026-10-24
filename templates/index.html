@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Mitra — Find a Job That Moves You Forward | Freshers & IT Careers{% endblock %}
+
+{% block content %}
+<!-- Hero Search Section -->
+<section class="hero-section">
+    <div class="container hero-content">
+        <div class="hero-badge-pill">
+            <span class="dot-pulse"></span>
+            <span>Zero Middleman Fees • 100% Free Direct HR Hiring for Freshers</span>
+        </div>
+        <h1 class="hero-title">Find a Job That <span class="text-gradient">Moves You Forward.</span></h1>
+        <p class="hero-desc">
+            Job Mitra connects fresh engineering graduates, BCA, MCA, and skilled IT job seekers directly with hiring managers across India. Browse genuine opportunities with transparent eligibility criteria.
+        </p>
+
+        <!-- Prominent Job Search Box -->
+        <div class="search-box-card">
+            <form action="{{ url_for('jobs.search_page') }}" method="GET" class="search-inputs-grid">
+                <div class="input-group">
+                    <i class="fa-solid fa-magnifying-glass input-icon"></i>
+                    <input type="text" name="q" placeholder="Job title, skill, or company (e.g. Full Stack, CAD, Python)..." autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-location-dot input-icon"></i>
+                    <select name="city">
+                        <option value="all">📍 All Locations (Pan-India)</option>
+                        <option value="Bengaluru">Bengaluru</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Delhi NCR">Delhi NCR / Noida / Gurugram</option>
+                        <option value="Hyderabad">Hyderabad</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Ahmedabad">Ahmedabad</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-graduation-cap input-icon"></i>
+                    <select name="stream">
+                        <option value="all">🎓 All Streams & Degrees</option>
+                        <option value="Computer Science / IT">Computer Science & IT</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Electronics & Communication">Electronics & Comm (ECE)</option>
+                        <option value="Chemical Engineering">Chemical Engineering</option>
+                        <option value="Mechatronics / Robotics">Mechatronics & Robotics</option>
+                        <option value="Any Graduate (All Streams)">Any Graduate (General / Ops)</option>
+                        <option value="Commerce & Finance (Graduates)">Commerce & Finance</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary" style="padding:0.75rem 1.4rem;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search Jobs
+                </button>
+            </form>
+
+            <div class="search-sub-bar">
+                <div class="filter-toggles">
+                    <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Quick Filter Tags:</span>
+                    <a href="{{ url_for('jobs.search_page', experience='Freshers / 0-1 yr') }}" class="chip">🎯 Freshers (0-1 yr)</a>
+                    <a href="{{ url_for('jobs.search_page', q='Internship') }}" class="chip">💼 Internships</a>
+                    <a href="{{ url_for('jobs.search_page', q='MCA') }}" class="chip">💻 MCA / BCA</a>
+                    <a href="{{ url_for('jobs.search_page', stream='Computer Science / IT') }}" class="chip">⚙️ B.Tech / B.E.</a>
+                    <a href="{{ url_for('jobs.search_page', work_mode='Remote') }}" class="chip">🌐 Remote Roles</a>
+                    <a href="{{ url_for('jobs.search_page', urgent='true') }}" class="chip">⚡ Urgent Hiring</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Stats Banner -->
+        <div class="hero-stats-banner">
+            <div class="h-stat-item">
+                <i class="fa-solid fa-briefcase text-primary"></i>
+                <span><strong>{{ total_jobs }} Live Vacancies</strong> currently published in database</span>
+            </div>
+            <div class="h-stat-item">
+                <i class="fa-solid fa-shield-halved text-success"></i>
+                <span><strong>Zero Placement Charges</strong> direct recruiter connect</span>
+            </div>
+            <div class="h-stat-item" onclick="openSubscriptionModal()" style="cursor:pointer;">
+                <i class="fa-solid fa-qrcode text-gold"></i>
+                <span><strong>UPI Pro Pass:</strong> <code>{{ app_upi_id }}</code></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Job Disciplines & Category Cards -->
+<section class="container" style="padding: 2.5rem 0;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+            <span class="badge-urgent"><i class="fa-solid fa-graduation-cap"></i> DISCIPLINES</span>
+            <h2 style="font-size:1.75rem; font-weight:800; color:#fff; margin-top:4px;">Explore Opportunities by Stream</h2>
+            <p style="font-size:0.875rem; color:var(--text-secondary);">Core engineering & graduate positions curated for entry-level candidates.</p>
+        </div>
+        <a href="{{ url_for('jobs.search_page') }}" class="btn-outline">View All Vacancies →</a>
+    </div>
+
+    <div class="category-cards-grid">
+        <a href="{{ url_for('jobs.search_page', stream='Computer Science / IT') }}" class="category-card">
+            <div class="category-icon"><i class="fa-solid fa-laptop-code"></i></div>
+            <h3>Computer Science & IT</h3>
+            <p>Software Engineer, Full Stack, Data Analyst, QA, Web Developer</p>
+        </a>
+
+        <a href="{{ url_for('jobs.search_page', stream='Mechanical Engineering') }}" class="category-card">
+            <div class="category-icon" style="background:rgba(245, 158, 11, 0.12); color:#FBBF24;"><i class="fa-solid fa-gears"></i></div>
+            <h3>Mechanical & Auto</h3>
+            <p>GET, 3D CAD Modeling, SolidWorks, Production & Quality Control</p>
+        </a>
+
+        <a href="{{ url_for('jobs.search_page', stream='Civil Engineering') }}" class="category-card">
+            <div class="category-icon" style="background:rgba(16, 185, 129, 0.12); color:#34D399;"><i class="fa-solid fa-building"></i></div>
+            <h3>Civil & Infrastructure</h3>
+            <p>Site Project Engineer, Estimation, AutoCAD Civil, Structural Survey</p>
+        </a>
+
+        <a href="{{ url_for('jobs.search_page', stream='Electrical Engineering') }}" class="category-card">
+            <div class="category-icon" style="background:rgba(239, 68, 68, 0.12); color:#F87171;"><i class="fa-solid fa-bolt"></i></div>
+            <h3>Electrical & Electronics</h3>
+            <p>Substation Operations, Embedded Systems, PCB Design, IoT Firmware</p>
+        </a>
+
+        <a href="{{ url_for('jobs.search_page', stream='Mechatronics / Robotics') }}" class="category-card">
+            <div class="category-icon" style="background:rgba(139, 92, 246, 0.12); color:#C084FC;"><i class="fa-solid fa-robot"></i></div>
+            <h3>Mechatronics & Robotics</h3>
+            <p>Industrial Automation, PLC Programming, SCADA, Sensor Integration</p>
+        </a>
+
+        <a href="{{ url_for('jobs.search_page', stream='Commerce & Finance (Graduates)') }}" class="category-card">
+            <div class="category-icon" style="background:rgba(59, 130, 246, 0.12); color:#60A5FA;"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>Finance & Operations</h3>
+            <p>Financial Analyst, B2B Growth Associate, Tally Prime, Accounts Executive</p>
+        </a>
+    </div>
+</section>
+
+<!-- Featured Database Vacancies -->
+<section class="container" style="padding: 2rem 0;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+            <span class="badge-gold-star"><i class="fa-solid fa-star text-gold"></i> FEATURED ROLES</span>
+            <h2 style="font-size:1.75rem; font-weight:800; color:#fff; margin-top:4px;">Recently Published Openings</h2>
+            <p style="font-size:0.875rem; color:var(--text-secondary);">Direct hiring posts from registered employers and curated demonstration records.</p>
+        </div>
+        <a href="{{ url_for('jobs.search_page') }}" class="btn-primary">Browse All {{ total_jobs }} Jobs</a>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+        {% for job in featured_jobs %}
+        <article class="job-card {% if job.is_premium %}is-premium-card{% endif %}">
+            <div class="job-card-header">
+                <div class="card-title-group">
+                    <div class="card-badges-row">
+                        <span class="stream-badge"><i class="fa-solid fa-graduation-cap"></i> {{ job.stream }}</span>
+                        {% if job.is_urgent %}
+                        <span class="urgent-badge"><i class="fa-solid fa-bolt"></i> Urgent Hiring</span>
+                        {% endif %}
+                        {% if job.is_premium %}
+                        <span class="badge-gold-star"><i class="fa-solid fa-crown text-gold"></i> Pro Priority</span>
+                        {% endif %}
+                        {% if job.is_demo %}
+                        <span class="demo-badge" title="Demonstration listing with simulated employer details"><i class="fa-solid fa-flask"></i> Sample Record</span>
+                        {% endif %}
+                    </div>
+                    <h3><a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" style="color:#fff;">{{ job.title }}</a></h3>
+                    <div class="company-line">
+                        <span><i class="fa-regular fa-building"></i> {{ job.company }}</span>
+                        {% if job.is_verified and not job.is_demo %}
+                        <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Employer</span>
+                        {% elif job.is_demo %}
+                        <span class="badge-unverified"><i class="fa-solid fa-info-circle"></i> Simulation Data</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <button class="btn-icon-action" onclick="toggleJobBookmark({{ job.id }}, this)" title="Save Job">
+                    <i class="fa-regular fa-bookmark"></i>
+                </button>
+            </div>
+
+            <div class="salary-location-row">
+                <div class="salary-tag">
+                    <i class="fa-solid fa-indian-rupee-sign"></i> {{ "{:,}".format(job.salary_min) }} - {{ "{:,}".format(job.salary_max) }} <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">/ month</span>
+                </div>
+                <div class="location-tag">
+                    <i class="fa-solid fa-location-dot text-primary"></i> {{ job.city }} • {{ job.work_mode or 'Onsite' }}
+                </div>
+                <div class="exp-tag">
+                    <i class="fa-solid fa-briefcase text-secondary"></i> {{ job.experience }}
+                </div>
+                <div class="qual-tag">
+                    <i class="fa-solid fa-user-graduate text-secondary"></i> {{ job.qualification }}
+                </div>
+            </div>
+
+            <div class="job-skills-bar">
+                <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Skills:</span>
+                {% for sk in job.skills_required.split(',') %}
+                    {% if sk.strip() %}
+                    <span class="skill-tag">{{ sk.strip() }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <p class="job-desc-snippet">{{ job.description }}</p>
+
+            <div class="card-actions-bar">
+                <div class="actions-left">
+                    <button class="btn-apply-quick" onclick="openApplyModal({{ job.id }}, '{{ job.title|escape }}', '{{ job.company|escape }}')">
+                        <i class="fa-solid fa-bolt"></i> 1-Click Apply
+                    </button>
+                    <button class="btn-send-mail" onclick="openSendMailModal({{ job.id }}, '{{ job.title|escape }}', '{{ job.company|escape }}', '{{ job.hr_email|escape }}', '{{ job.hr_phone|escape }}')">
+                        <i class="fa-regular fa-envelope"></i> Send Mail to HR
+                    </button>
+                    <a href="tel:{{ job.hr_phone }}" class="btn-call-hr" title="Call recruiter contact directly">
+                        <i class="fa-solid fa-phone"></i> Call HR
+                    </a>
+                </div>
+                <div class="actions-right">
+                    <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="btn-view-details">View Full Specs →</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section" id="how-it-works">
+    <div class="container">
+        <div class="section-header-center">
+            <span class="badge-urgent"><i class="fa-solid fa-lightbulb"></i> SIMPLE & TRANSPARENT</span>
+            <h2>How Job Mitra Works for Freshers</h2>
+            <p>Three straightforward steps to land direct interviews without agents or hidden commission fees.</p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <span class="step-number">1</span>
+                <div class="step-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                <h3>Build Your Profile & Add Skills</h3>
+                <p>Register as a candidate and list your core technical competencies (Python, CAD, PLC, SQL). Our transparent engine calculates your exact eligibility match percentage.</p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">2</span>
+                <div class="step-icon"><i class="fa-solid fa-sliders"></i></div>
+                <h3>Filter by Stream & Work Mode</h3>
+                <p>Browse openings curated for your specific engineering degree or graduation year. Filter by onsite cities or pan-India remote positions.</p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">3</span>
+                <div class="step-icon"><i class="fa-solid fa-handshake-angle"></i></div>
+                <h3>Connect Directly with HR</h3>
+                <p>Submit 1-click applications or use our direct email dispatcher and phone lines to pitch directly to talent acquisition partners.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Career Tips & Resume Resources Section -->
+<section class="container" style="padding: 3rem 0;">
+    <div class="glass-panel" style="padding:2.5rem; background: linear-gradient(135deg, rgba(17,24,39,0.9) 0%, rgba(30,41,59,0.85) 100%);">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:center;">
+            <div>
+                <span class="badge-gold-star"><i class="fa-solid fa-file-pen text-gold"></i> CAREER RESOURCES</span>
+                <h2 style="font-size:1.75rem; font-weight:800; color:#fff; margin:0.5rem 0;">Fresher Resume & Interview Playbook</h2>
+                <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:1.5rem;">
+                    Increase your callback rate by 3x with tailored guidelines for graduate engineers:
+                </p>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.75rem; font-size:0.84rem; color:var(--text-main);">
+                    <li><i class="fa-solid fa-circle-check text-success"></i> <strong>Highlight Academic Capstone Projects:</strong> Emphasize hands-on code repos, circuit prototypes, or CAD drawings.</li>
+                    <li><i class="fa-solid fa-circle-check text-success"></i> <strong>Quantifiable Skill Tags:</strong> Match the exact keyword strings required by hiring recruiters.</li>
+                    <li><i class="fa-solid fa-circle-check text-success"></i> <strong>Clean 1-Page Layout:</strong> PDF formatting optimized for applicant tracking scanners.</li>
+                </ul>
+            </div>
+            <div style="text-align:center;">
+                <div class="glass-panel" style="padding:1.5rem; display:inline-block; border-color:var(--primary);">
+                    <i class="fa-solid fa-crown text-gold" style="font-size:2.5rem; margin-bottom:0.75rem;"></i>
+                    <h3 style="color:#fff; font-size:1.15rem;">Job Mitra Pro Career Pass</h3>
+                    <p style="color:var(--text-secondary); font-size:0.8125rem; margin:0.5rem 0 1rem 0;">
+                        Unlock verified recruiter lines, top 1% application ranking, and transparent matching.
+                    </p>
+                    <button class="btn-primary" onclick="openSubscriptionModal()">
+                        <i class="fa-solid fa-bolt"></i> Upgrade from ₹99 via UPI
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

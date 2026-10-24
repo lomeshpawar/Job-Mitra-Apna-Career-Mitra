@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Security Audit Logs — Admin Command{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('admin.dashboard') }}">Admin Command</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">Security Audit Logs</span>
+    </div>
+
+    <div class="dash-header-card" style="margin-bottom:1.5rem;">
+        <div>
+            <h1>Platform Security & Audit Logs</h1>
+            <p>Immutable event logging for authentication, payment state updates, role changes, and moderation.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem;">
+        {% if logs %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>User Account</th>
+                        <th>Role</th>
+                        <th>IP Address</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in logs %}
+                    <tr>
+                        <td style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">{{ l.created_at }}</td>
+                        <td><span class="stream-badge" style="font-size:0.72rem;">{{ l.action }}</span></td>
+                        <td>{{ l.target_type }} ({{ l.target_id or '-' }})</td>
+                        <td>{{ l.user_email or 'System / Anonymous' }}</td>
+                        <td><span class="badge-verified" style="font-size:0.68rem;">{{ l.user_role or 'N/A' }}</span></td>
+                        <td style="font-family:monospace; font-size:0.75rem;">{{ l.ip_address }}</td>
+                        <td style="font-size:0.75rem; color:var(--text-secondary); max-width:320px;">{{ l.details }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2rem; color:var(--text-muted);">No audit logs recorded yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

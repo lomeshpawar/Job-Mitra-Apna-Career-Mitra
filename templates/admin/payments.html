@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Reference & Subscription Audit — Admin Command{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 2rem auto;">
+    <!-- Breadcrumb -->
+    <div style="font-size:0.8125rem; color:var(--text-muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+        <a href="{{ url_for('admin.dashboard') }}">Admin Command</a>
+        <span>/</span>
+        <span style="color:var(--text-main);">Payment Reference & Subscription Audit</span>
+    </div>
+
+    <div class="dash-header-card" style="margin-bottom:1.5rem;">
+        <div>
+            <h1>Payment & Subscription Audit Ledger</h1>
+            <p>Audited Payment State Machine: <code>PENDING → VERIFIED → ACTIVE</code> (Failure states: <code>FAILED</code>, <code>CANCELLED</code>, <code>EXPIRED</code>).</p>
+        </div>
+        <div class="top-upi-pill">
+            <i class="fa-solid fa-qrcode text-gold"></i> UPI Gateway ID: <strong>{{ app_upi_id }}</strong>
+        </div>
+    </div>
+
+    <!-- Payments Ledger Table -->
+    <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:1rem;">
+            <i class="fa-solid fa-receipt text-gold"></i> Candidate UPI Reference Submissions
+        </h3>
+
+        {% if payments %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>12-Digit UPI Reference (UTR)</th>
+                        <th>Candidate User</th>
+                        <th>Plan Name</th>
+                        <th>Amount</th>
+                        <th>Submitted At</th>
+                        <th>State Machine Status</th>
+                        <th>Admin Verification Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>#{{ p.id }}</td>
+                        <td>
+                            <strong style="font-family:monospace; color:var(--gold); font-size:0.875rem;">{{ p.utr_number }}</strong>
+                        </td>
+                        <td>
+                            <div>{{ p.user_name }}</div>
+                            <div style="font-size:0.72rem; color:var(--text-muted);">{{ p.user_email }}</div>
+                        </td>
+                        <td>{{ p.plan_name }}</td>
+                        <td><strong style="color:#4ADE80;">₹{{ p.amount }}</strong></td>
+                        <td>{{ p.created_at }}</td>
+                        <td>
+                            <span class="badge-verified" style="{% if p.status == 'ACTIVE' %}background:var(--success-bg); color:var(--success);{% elif p.status == 'PENDING' %}background:var(--warning-bg); color:var(--warning);{% else %}background:var(--danger-bg); color:var(--danger);{% endif %}">
+                                {{ p.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if p.status == 'PENDING' %}
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn-success" onclick="verifyPayment({{ p.id }}, 'ACTIVE')" style="padding:3px 10px; font-size:0.75rem;">
+                                    <i class="fa-solid fa-check"></i> Verify & Activate
+                                </button>
+                                <button class="btn-danger" onclick="verifyPayment({{ p.id }}, 'FAILED')" style="padding:3px 8px; font-size:0.75rem;">
+                                    Reject
+                                </button>
+                            </div>
+                            {% else %}
+                            <span style="font-size:0.75rem; color:var(--text-muted);">
+                                Verified at: {{ p.verified_at or 'Completed' }}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+            <i class="fa-solid fa-receipt" style="font-size:2.5rem; margin-bottom:0.75rem;"></i>
+            <h4 style="color:#fff;">No Payment References in Ledger</h4>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Active Subscriptions Table -->
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:1rem;">
+            <i class="fa-solid fa-crown text-gold"></i> Active Pro Subscriptions
+        </h3>
+
+        {% if subscriptions %}
+        <div class="data-table-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Subscription ID</th>
+                        <th>User Account</th>
+                        <th>Plan Name</th>
+                        <th>Amount</th>
+                        <th>Activated At</th>
+                        <th>Expires At</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in subscriptions %}
+                    <tr>
+                        <td>#{{ s.id }}</td>
+                        <td>
+                            <div>{{ s.user_name }}</div>
+                            <div style="font-size:0.72rem; color:var(--text-muted);">{{ s.user_email }}</div>
+                        </td>
+                        <td>{{ s.plan_name }}</td>
+                        <td><strong style="color:#4ADE80;">₹{{ s.amount }}</strong></td>
+                        <td>{{ s.starts_at or s.subscribed_at }}</td>
+                        <td>{{ s.expires_at or 'Standard Validity' }}</td>
+                        <td>
+                            <span class="badge-verified" style="background:var(--success-bg); color:var(--success);">
+                                {{ s.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:2rem; color:var(--text-muted);">
+            No active subscriptions found.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function verifyPayment(paymentId, newStatus) {
+        if (!confirm(`Are you sure you want to transition payment #${paymentId} to ${newStatus}?`)) return;
+
+        try {
+            const res = await fetch(`/admin/api/payments/${paymentId}/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken()
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to update payment status', 'error');
+            }
+        } catch (e) {
+            showToast('Network error verifying payment', 'error');
+        }
+    }
+</script>
+{% endblock %}
