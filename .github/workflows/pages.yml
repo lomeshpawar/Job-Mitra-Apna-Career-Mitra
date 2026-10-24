@@ -1,13 +1,14 @@
-name: Deploy Frontend Preview to GitHub Pages
+name: Deploy Static Project Preview to GitHub Pages
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "templates/**"
-      - "static/**"
       - "PAGES-README.md"
       - ".github/workflows/pages.yml"
+      - "README.md"
+      - "templates/**"
+      - "static/**"
   workflow_dispatch:
 
 permissions:
@@ -25,7 +26,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      - name: Prepare static informational preview
+      - name: Prepare static project information page
         run: |
           mkdir -p _site
           cat > _site/index.html <<'HTML'
@@ -34,43 +35,40 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <meta name="description" content="Job Mitra — a Flask-based job portal portfolio project.">
+            <meta name="description" content="Job Mitra — Flask job portal portfolio project.">
             <title>Job Mitra — Apna Career Mitra</title>
             <style>
-              :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#0b1020;color:#f8fafc}
-              *{box-sizing:border-box}body{margin:0;line-height:1.65;background:radial-gradient(ellipse at 15% 5%,#26204e 0,transparent 45%),#0b1020}
-              main{max-width:920px;margin:auto;padding:64px 24px}p,li{color:#cbd5e1}h1{font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.08;margin:.6em 0}
-              .pill{display:inline-block;border:1px solid #4f46e5;border-radius:99px;padding:5px 12px;color:#c4b5fd;font-size:.9rem}
-              .card{background:#111827d9;border:1px solid #334155;border-radius:20px;padding:24px;margin:24px 0}
-              a{color:#a5b4fc}code{color:#ddd6fe}footer{color:#94a3b8;margin-top:40px;font-size:.9rem}
+            :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#0b1020;color:#f8fafc}
+            *{box-sizing:border-box}body{margin:0;line-height:1.65;background:radial-gradient(ellipse at 15% 5%,#26204e 0,transparent 45%),#0b1020}
+            main{max-width:920px;margin:auto;padding:64px 24px}p,li{color:#cbd5e1}h1{font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.08;margin:.6em 0}
+            .pill{display:inline-block;border:1px solid #4f46e5;border-radius:99px;padding:5px 12px;color:#c4b5fd;font-size:.9rem}
+            .card{background:#111827d9;border:1px solid #334155;border-radius:20px;padding:24px;margin:24px 0}a{color:#a5b4fc}code{color:#ddd6fe}footer{color:#94a3b8;margin-top:40px;font-size:.9rem}
             </style>
           </head>
           <body><main>
             <span class="pill">Portfolio Project · Flask + Jinja2</span>
             <h1>Job Mitra</h1>
-            <p>Apna Career Mitra — a job portal project focused on helping fresh graduates explore opportunities and practice candidate, recruiter, and administrator workflows.</p>
+            <p>Apna Career Mitra is a job-portal project for fresh graduates and IT job seekers, with candidate, recruiter, and administrator workflows.</p>
             <section class="card"><h2>Project capabilities</h2>
-              <ul><li>Job discovery with filters and pagination</li><li>Candidate profiles, skills, and application tracking</li><li>Recruiter job postings and applicant management</li><li>Admin moderation and employer verification flows</li><li>Explainable job matching and automated tests</li></ul>
+              <ul><li>Job discovery, filters, and pagination</li><li>Candidate profiles, skills, and application tracking</li><li>Recruiter job postings and applicant management</li><li>Admin moderation and employer-verification workflows</li><li>Explainable job matching and automated tests</li></ul>
             </section>
-            <section class="card"><h2>Important: this is a static preview</h2>
-              <p>The full project is a server-rendered Flask application. This GitHub Pages page is an informational preview only; login, search, applications, and database-backed features require the Flask backend and database to be deployed separately.</p>
-              <p><a href="https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra">View source code and setup instructions on GitHub →</a></p>
+            <section class="card"><h2>Static preview only</h2>
+              <p>The full app is server-rendered using Flask and Jinja templates. This static page is an informational preview; authentication, job search, applications, and database-backed features require the Flask backend and a database.</p>
+              <p><a href="https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra">View source code and setup instructions →</a></p>
             </section>
-            <section class="card"><h2>Run the full application</h2>
-              <p>Install the requirements, configure a local <code>.env</code> file, and start the Flask server:</p>
+            <section class="card"><h2>Run the full app locally</h2>
               <pre><code>pip install -r requirements.txt
 python app.py</code></pre>
-              <p>Open <code>http://127.0.0.1:5000</code>. See the repository README for complete setup and security notes.</p>
+              <p>Open <code>http://127.0.0.1:5000</code>. Configure a secure local <code>.env</code> first and read the repository README for complete setup details.</p>
             </section>
             <footer>Built by Lomesh Pawar · Academic portfolio project</footer>
           </main></body></html>
           HTML
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+
   deploy:
     needs: build
     environment:
