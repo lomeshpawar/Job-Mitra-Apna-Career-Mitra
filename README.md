@@ -134,3 +134,6 @@ For a public deployment:
 ## Author
 
 **Lomesh Pawar** · [GitHub](https://github.com/lomeshpawar)
+
+
+> **Deployment note:** The GitHub Pages workflow publishes the static preview using the `GitHub Actions` Pages source. After enabling Pages in repository settings, a new push to `main` triggers deployment.
