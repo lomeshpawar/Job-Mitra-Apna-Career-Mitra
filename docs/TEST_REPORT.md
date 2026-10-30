@@ -1,13 +1,27 @@
 # Job Mitra — Automated Test Execution Report
 
-**Execution Date:** October 2026  
-**Environment:** Python 3.14.8, Pytest 9.1.1, Flask 3.1.3, SQLite 3  
-**Overall Result:** **29/29 PASSED (100% Success Rate)**  
-**Execution Duration:** 2.30 seconds  
+**Latest PR #3 CI verification:** **45/45 passed** on Python 3.14.9 / Ubuntu 24.04 in 0.76 seconds. [GitHub Actions run #41108659165](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/runs/41108659165).  
+**Historical local execution:** 29/29 passed in 2.30 seconds with Python 3.14.8, Pytest 9.1.1, Flask 3.1.3, and SQLite 3.  
 
 ---
 
-## 1. Executive Summary
+## GitHub Actions verification — 30 October 2026
+
+- Workflow: **Python CI**
+- Pull request: [#3 — Reject placeholder session and payment configuration](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/pull/3)
+- Latest completed PR head: `42854a392f73e0a0c690310c8aa0de5094db5795`
+- Runner: Ubuntu 24.04
+- Python: 3.14.9
+- Application and test-module compilation: passed
+- Pytest: **45 passed in 0.76s**
+
+The current CI suite includes the original 29 tests plus 16 configuration and payment checks for missing/placeholder session keys, UPI destination handling, app-startup validation, and payment-submission fail-closed behavior. This result is from GitHub Actions, not a local execution claim.
+
+## Historical local execution summary
+
+The detailed test listing below records the original 29-test local run. The additional 14 CI test cases are summarized above.
+
+## Historical test-case listing
 
 A comprehensive automated test suite and live end-to-end smoke test runner were executed to verify all bug fixes, security controls, database constraints, role-based access rules, payment state transitions, and UI routes.
 
@@ -52,7 +66,7 @@ tests/test_security_csrf.py::test_csrf_validation_enforcement PASSED     [100%]
 
 ---
 
-## 2. Test Suite Breakdown by Security & Functional Area
+## Test Suite Breakdown by Security & Functional Area
 
 ### 2.1 Authentication & Role-Based Access Control (`tests/test_auth_rbac.py`)
 | Test Case | Description | Result |

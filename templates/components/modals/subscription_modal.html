@@ -57,6 +57,7 @@
             </div>
 
             <!-- UPI Payment Box -->
+            {% if app_upi_id %}
             <div style="display:grid; grid-template-columns: 200px 1fr; gap:1.25rem; align-items:center; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-top:0.5rem;">
                 <div style="text-align:center;">
                     <img id="upiQrCodeImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa={{ app_upi_id }}%26pn=Job%20Mitra%26cu=INR%26am=199" alt="Job Mitra UPI QR Code" style="width:160px; height:160px; border-radius:var(--radius-sm); border:2px solid #fff; background:#fff; padding:4px;">
@@ -91,6 +92,12 @@
                     </form>
                 </div>
             </div>
+            {% else %}
+            <div role="status" style="margin-top:0.5rem; padding:1rem; border:1px solid var(--border); border-radius:var(--radius); color:var(--text-secondary);">
+                <strong>UPI payment is not configured.</strong>
+                Payment reference submission is unavailable until a payment destination is configured by the application operator.
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
