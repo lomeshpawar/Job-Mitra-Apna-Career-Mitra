@@ -17,7 +17,7 @@
             <p>Audited Payment State Machine: <code>PENDING → VERIFIED → ACTIVE</code> (Failure states: <code>FAILED</code>, <code>CANCELLED</code>, <code>EXPIRED</code>).</p>
         </div>
         <div class="top-upi-pill">
-            <i class="fa-solid fa-qrcode text-gold"></i> UPI Gateway ID: <strong>{{ app_upi_id }}</strong>
+            <i class="fa-solid fa-qrcode text-gold"></i> UPI Gateway ID: <strong>{{ app_upi_id or 'Not configured' }}</strong>
         </div>
     </div>
 
