@@ -36,10 +36,18 @@ def test_non_placeholder_upi_destination_is_configured():
     assert is_configured_upi_id("merchant@bank") is True
 
 
-def test_app_factory_rejects_placeholder_session_key():
-    class PlaceholderConfig:
-        SECRET_KEY = "replace-with-a-cryptographically-secure-random-secret-key"
+@pytest.mark.parametrize(
+    "secret_key",
+    [
+        None,
+        "",
+        "replace-with-a-cryptographically-secure-random-secret-key",
+    ],
+)
+def test_app_factory_rejects_missing_or_placeholder_session_key(secret_key):
+    class InvalidConfig:
+        SECRET_KEY = secret_key
         TESTING = False
 
     with pytest.raises(RuntimeError, match="SECRET_KEY"):
-        create_app(PlaceholderConfig)
+        create_app(InvalidConfig)
