@@ -1,19 +1,19 @@
 # Job Mitra — Automated Test Execution Report
 
-**Latest CI verification:** **43/43 passed** on 30 October 2026 with Python 3.14.9 on Ubuntu 24.04; pytest completed in 0.99 seconds. [GitHub Actions run #41108143975](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/runs/41108143975).  
+**CI verification:** **43/43 passed** on Python 3.14.9 / Ubuntu 24.04 in two PR #3 runs: 0.99 seconds in [run #41108143975](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/runs/41108143975) and 1.83 seconds in the later [run #41108342794](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/runs/41108342794).  
 **Historical local execution:** 29/29 passed in 2.30 seconds with Python 3.14.8, Pytest 9.1.1, Flask 3.1.3, and SQLite 3.  
 
 ---
 
-## Latest GitHub Actions verification — 30 October 2026
+## GitHub Actions verification — 30 October 2026
 
 - Workflow: **Python CI**
 - Pull request: [#3 — Reject placeholder session and payment configuration](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/pull/3)
-- Commit: `5f3fcd8c618b367808163c07cca0121cff765b59`
+- Latest completed PR head: `aa1cb5490d14d8c17b49bf13207ab044c298e701`
 - Runner: Ubuntu 24.04
 - Python: 3.14.9
 - Application and test-module compilation: passed
-- Pytest: **43 passed in 0.99s**
+- Pytest: **43 passed in 1.83s**
 
 The current CI suite includes the original 29 tests plus configuration checks for missing/placeholder session keys, UPI destination handling, and payment-submission fail-closed behavior. This result is from GitHub Actions, not a local execution claim.
 
