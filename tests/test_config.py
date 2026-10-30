@@ -20,7 +20,7 @@ def test_unusable_session_keys_are_rejected(value):
     assert is_usable_secret_key(value) is False
 
 
-def test_unique_session_key_of_sufficient_length_is_accepted():
+def test_non_placeholder_session_key_of_sufficient_length_is_accepted():
     assert is_usable_secret_key("a" * 64) is True
 
 
