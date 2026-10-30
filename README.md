@@ -82,7 +82,7 @@ pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Edit `.env` and set a strong random `SECRET_KEY`. Use SQLite for a simple local start unless you specifically need MySQL. Keep the real `.env` file out of Git.
+Edit `.env` and set `SECRET_KEY` to a unique random value of at least 32 characters (for example, generate one with `python -c "import secrets; print(secrets.token_hex(32))"`). The application rejects missing, short, or known example placeholder keys outside tests. Configure `UPI_ID` only when you intentionally enable the demo/manual payment flow; the example value is treated as unconfigured, and payment-reference submission stays disabled until a real destination is supplied. This project does not claim live payment-gateway processing. Use SQLite for a simple local start unless you specifically need MySQL. Keep the real `.env` file out of Git.
 
 ### 3. Start the web application
 
