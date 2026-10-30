@@ -2,6 +2,8 @@
 
 A Flask-based job portal concept for fresh graduates and IT job seekers. The application brings together job discovery, candidate profiles, applications, recruiter workflows, moderation, and explainable job matching in one project.
 
+[![Python CI](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/workflows/python-ci.yml/badge.svg?branch=main)](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/workflows/python-ci.yml)
+
 ## GitHub Pages frontend preview
 
 **Static preview:** https://lomeshpawar.github.io/Job-Mitra-Apna-Career-Mitra/
