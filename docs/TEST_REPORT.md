@@ -1,13 +1,27 @@
 # Job Mitra — Automated Test Execution Report
 
-**Execution Date:** October 2026  
-**Environment:** Python 3.14.8, Pytest 9.1.1, Flask 3.1.3, SQLite 3  
-**Overall Result:** **29/29 PASSED (100% Success Rate)**  
-**Execution Duration:** 2.30 seconds  
+**Latest CI verification:** **43/43 passed** on 30 October 2026 with Python 3.14.9 on Ubuntu 24.04; pytest completed in 0.99 seconds. [GitHub Actions run #41108143975](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/actions/runs/41108143975).  
+**Historical local execution:** 29/29 passed in 2.30 seconds with Python 3.14.8, Pytest 9.1.1, Flask 3.1.3, and SQLite 3.  
 
 ---
 
-## 1. Executive Summary
+## Latest GitHub Actions verification — 30 October 2026
+
+- Workflow: **Python CI**
+- Pull request: [#3 — Reject placeholder session and payment configuration](https://github.com/lomeshpawar/Job-Mitra-Apna-Career-Mitra/pull/3)
+- Commit: `5f3fcd8c618b367808163c07cca0121cff765b59`
+- Runner: Ubuntu 24.04
+- Python: 3.14.9
+- Application and test-module compilation: passed
+- Pytest: **43 passed in 0.99s**
+
+The current CI suite includes the original 29 tests plus configuration checks for missing/placeholder session keys, UPI destination handling, and payment-submission fail-closed behavior. This result is from GitHub Actions, not a local execution claim.
+
+## 1. Historical local execution summary
+
+The detailed test listing below records the original 29-test local run. The additional 14 CI test cases are summarized above.
+
+## 2. Historical test-case breakdown
 
 A comprehensive automated test suite and live end-to-end smoke test runner were executed to verify all bug fixes, security controls, database constraints, role-based access rules, payment state transitions, and UI routes.
 
