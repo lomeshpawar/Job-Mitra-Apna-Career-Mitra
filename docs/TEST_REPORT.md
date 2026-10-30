@@ -17,11 +17,11 @@
 
 The current CI suite includes the original 29 tests plus configuration checks for missing/placeholder session keys, UPI destination handling, and payment-submission fail-closed behavior. This result is from GitHub Actions, not a local execution claim.
 
-## 1. Historical local execution summary
+## Historical local execution summary
 
 The detailed test listing below records the original 29-test local run. The additional 14 CI test cases are summarized above.
 
-## 2. Historical test-case breakdown
+## Historical test-case listing
 
 A comprehensive automated test suite and live end-to-end smoke test runner were executed to verify all bug fixes, security controls, database constraints, role-based access rules, payment state transitions, and UI routes.
 
@@ -66,7 +66,7 @@ tests/test_security_csrf.py::test_csrf_validation_enforcement PASSED     [100%]
 
 ---
 
-## 2. Test Suite Breakdown by Security & Functional Area
+## Test Suite Breakdown by Security & Functional Area
 
 ### 2.1 Authentication & Role-Based Access Control (`tests/test_auth_rbac.py`)
 | Test Case | Description | Result |
