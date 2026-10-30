@@ -5,7 +5,7 @@ Stack: Python Flask, SQLite/MySQL, HTML5, CSS3, JavaScript.
 """
 import os
 from flask import Flask, render_template, jsonify, session, request
-from config import Config
+from config import Config, is_configured_upi_id, is_usable_secret_key
 from routes import register_blueprints
 from security import generate_csrf_token, validate_csrf
 from database import query_db
@@ -14,6 +14,12 @@ def create_app(config_class=Config):
     """Application factory for Job Mitra."""
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    if not app.config.get('TESTING') and not is_usable_secret_key(app.config.get('SECRET_KEY')):
+        raise RuntimeError(
+            "SECRET_KEY must be configured with a unique random value of at least 32 characters; "
+            "example placeholders are not accepted."
+        )
 
     # Register blueprints
     register_blueprints(app)
@@ -48,7 +54,7 @@ def create_app(config_class=Config):
                 'is_premium': is_premium
             },
             'is_logged_in': is_logged_in,
-            'app_upi_id': app.config.get('UPI_ID', '7770009027-2@axl'),
+            'app_upi_id': app.config.get('UPI_ID', '') if is_configured_upi_id(app.config.get('UPI_ID')) else '',
             'gateway_live': app.config.get('PAYMENT_GATEWAY_LIVE', False)
         }
 
