@@ -17,7 +17,7 @@ def create_app(config_class=Config):
 
     if not app.config.get('TESTING') and not is_usable_secret_key(app.config.get('SECRET_KEY')):
         raise RuntimeError(
-            "SECRET_KEY must be configured with a unique random value of at least 32 characters; "
+            "SECRET_KEY must be configured with a non-placeholder value of at least 32 characters; "
             "example placeholders are not accepted."
         )
 
@@ -44,6 +44,8 @@ def create_app(config_class=Config):
             if cand:
                 is_premium = bool(cand['is_premium'])
 
+        upi_id = app.config.get('UPI_ID', '')
+
         return {
             'csrf_token': generate_csrf_token,
             'current_user': {
@@ -54,7 +56,7 @@ def create_app(config_class=Config):
                 'is_premium': is_premium
             },
             'is_logged_in': is_logged_in,
-            'app_upi_id': app.config.get('UPI_ID', '') if is_configured_upi_id(app.config.get('UPI_ID')) else '',
+            'app_upi_id': upi_id if is_configured_upi_id(upi_id) else '',
             'gateway_live': app.config.get('PAYMENT_GATEWAY_LIVE', False)
         }
 
