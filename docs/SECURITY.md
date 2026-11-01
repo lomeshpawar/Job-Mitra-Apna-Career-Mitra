@@ -2,7 +2,7 @@
 
 **Project:** Job Mitra — Apna Career Mitra  
 **Document Version:** 2.0 (Security Hardened)  
-**Security Lead:** Senior Application Security Engineer  
+**Document status:** Maintainer-authored project notes; not an independent security audit.  
 
 ---
 
