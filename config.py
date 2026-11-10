@@ -1,21 +1,49 @@
 """
 Job Mitra - Application Configuration
-Loads settings securely from environment variables with safe defaults for development.
+Loads environment settings and rejects placeholder security configuration at runtime.
 """
 import os
-import secrets
 from dotenv import load_dotenv
 
 # Load .env file from project root
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
+_SECRET_KEY_PLACEHOLDERS = {
+    "jobmitra-secret-2026",
+    "replace-with-a-cryptographically-secure-random-secret-key",
+    "change-me",
+    "your-secret-key",
+}
+_UPI_ID_PLACEHOLDERS = {
+    "your-business-upi@bank",
+    "your-upi-id@bank",
+    "replace-with-your-upi-id",
+}
+
+
+def is_usable_secret_key(value):
+    """Return whether a runtime Flask session key is non-placeholder and sufficiently long."""
+    if not isinstance(value, str):
+        return False
+    candidate = value.strip()
+    return (
+        len(candidate) >= 32
+        and candidate.lower() not in _SECRET_KEY_PLACEHOLDERS
+    )
+
+
+def is_configured_upi_id(value):
+    """Return whether a payment destination is configured rather than an example placeholder."""
+    if not isinstance(value, str):
+        return False
+    candidate = value.strip()
+    return bool(candidate and candidate.lower() not in _UPI_ID_PLACEHOLDERS)
+
+
 class Config:
     # Flask Security
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    if not SECRET_KEY or SECRET_KEY == 'jobmitra-secret-2026':
-        # Generate an ephemeral secure key if none is securely supplied, with a warning
-        SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
+    SECRET_KEY = os.getenv('SECRET_KEY', '').strip()
 
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1', 'yes')
     PORT = int(os.getenv('PORT', 5000))
@@ -39,7 +67,7 @@ class Config:
     DB_NAME = os.getenv('DB_NAME', 'jobmitra_portal')
 
     # UPI & Payment Configuration
-    UPI_ID = os.getenv('UPI_ID', '7770009027-2@axl')
+    UPI_ID = os.getenv('UPI_ID', '').strip()
     PAYMENT_GATEWAY_LIVE = os.getenv('PAYMENT_GATEWAY_LIVE', 'False').lower() in ('true', '1', 'yes')
     PAYMENT_GATEWAY_NAME = os.getenv('PAYMENT_GATEWAY_NAME', 'Manual UPI Verification / Demo')
     RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', '')

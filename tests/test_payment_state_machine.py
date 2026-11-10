@@ -4,6 +4,7 @@ PENDING -> VERIFIED -> ACTIVE (Failure: FAILED, CANCELLED)
 """
 import pytest
 from database import query_db
+from config import Config
 
 def test_utr_submission_creates_pending_payment(candidate_client):
     """
@@ -51,6 +52,32 @@ def test_invalid_utr_length_rejected(candidate_client):
         'amount': 199
     })
     assert resp.status_code == 400
+
+def test_payment_reference_rejected_when_upi_destination_is_unconfigured(candidate_client, monkeypatch):
+    """Payment references must not be accepted when no merchant destination is configured."""
+    monkeypatch.setattr(Config, "UPI_ID", "your-business-upi@bank")
+
+    response = candidate_client.post('/api/subscription/activate', json={
+        'utr_number': '123456789012',
+        'plan_name': 'Graduate Career Pro',
+        'amount': 199
+    })
+
+    assert response.status_code == 503
+    assert response.get_json()['success'] is False
+    assert 'not configured' in response.get_json()['error'].lower()
+
+
+def test_plan_response_marks_placeholder_upi_as_unconfigured(client, monkeypatch):
+    """The public plans API must not present the example UPI value as a live destination."""
+    monkeypatch.setattr(Config, "UPI_ID", "your-business-upi@bank")
+
+    response = client.get('/api/subscription/plans')
+
+    assert response.status_code == 200
+    assert response.get_json()['upi_id'] == ""
+    assert response.get_json()['payment_configured'] is False
+
 
 def test_admin_payment_verification_activates_pro(admin_client):
     """
