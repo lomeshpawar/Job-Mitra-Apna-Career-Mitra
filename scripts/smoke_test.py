@@ -1,6 +1,11 @@
 """
-Job Mitra - Smoke Test Script
-Executes end-to-end HTTP request testing across all views and API endpoints against the live local database.
+Job Mitra - Route Smoke Check Script
+
+Uses Flask's in-process test_client() to exercise selected GET routes. It does
+not start a separate HTTP server. Candidate, recruiter, and administrator
+checks use synthetic Flask session values, and database-backed views depend
+on the application's configured database. Never point this script at a
+production database. The current GitHub Actions Python CI does not run it.
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -9,7 +14,7 @@ from database import query_db
 
 def run_smoke_tests():
     print("=" * 60)
-    print(" Running Job Mitra Comprehensive Smoke Tests")
+    print(" Running Job Mitra Route Smoke Checks")
     print("=" * 60)
 
     client = app.test_client()
@@ -88,9 +93,9 @@ def run_smoke_tests():
 
     print("=" * 60)
     if all_passed:
-        print(" ALL SMOKE TESTS PASSED CLEANLY (100% OK)!")
+        print(" ALL ROUTE SMOKE CHECKS PASSED!")
     else:
-        print(" SOME SMOKE TESTS FAILED. CHECK LOGS ABOVE.")
+        print(" SOME ROUTE SMOKE CHECKS FAILED. CHECK LOGS ABOVE.")
     print("=" * 60)
 
 if __name__ == '__main__':
