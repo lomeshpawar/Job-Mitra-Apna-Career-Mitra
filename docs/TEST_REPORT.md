@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-A comprehensive automated test suite and live end-to-end smoke test runner were executed to verify all bug fixes, security controls, database constraints, role-based access rules, payment state transitions, and UI routes.
+The report records a 29-case pytest execution. A separate route smoke-test script exists; its implementation and execution limitations are described in Section 3. This distinction matters because the current GitHub Actions workflow does not run that smoke-test script.
 
 ```
 ============================= test session starts =============================
@@ -113,9 +113,11 @@ tests/test_security_csrf.py::test_csrf_validation_enforcement PASSED     [100%]
 
 ---
 
-## 3. End-to-End Live HTTP Smoke Tests (`scripts/smoke_test.py`)
+## 3. Route Smoke Checks (`scripts/smoke_test.py`)
 
-All 12 live HTTP routes tested against the running local database:
+`scripts/smoke_test.py` currently defines **17 GET checks**: 8 public routes, 1 candidate route, 2 recruiter routes, and 6 administrator routes. It uses Flask's in-process `app.test_client()`; it does not start a separate HTTP server. The `[PASS]` entries below are the report's recorded local results and have not been independently verified by this documentation change.
+
+The current GitHub Actions Python CI runs `compileall` and `pytest` only; it does **not** execute `scripts/smoke_test.py`. The script imports the application and database module but does not create an isolated disposable database or seed the records it references. Re-run it in a controlled test environment before treating the route checks as reproducible.
 - `[PASS]` Homepage (`GET /`)
 - `[PASS]` Search Page (`GET /jobs`)
 - `[PASS]` Job Detail Page (`GET /jobs/1`)
