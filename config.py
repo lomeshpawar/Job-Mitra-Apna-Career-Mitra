@@ -10,14 +10,40 @@ from dotenv import load_dotenv
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
+_PLACEHOLDER_SECRET_KEYS = {
+    'jobmitra-secret-2026',
+    'replace-with-a-cryptographically-secure-random-secret-key',
+}
+
+
+def resolve_secret_key(configured_key, debug_mode=False):
+    """Return a configured secret key or reject known placeholders.
+
+    A missing key may be generated for local debug use. Non-debug runs must
+    provide a stable, operator-generated key so sessions remain valid across
+    process restarts and multiple application workers.
+    """
+    secret_key = (configured_key or '').strip()
+
+    if secret_key.lower() in _PLACEHOLDER_SECRET_KEYS:
+        secret_key = ''
+
+    if not secret_key:
+        if debug_mode:
+            return secrets.token_hex(32)
+        raise RuntimeError(
+            'Set SECRET_KEY to a unique random value before running Job Mitra '
+            'with FLASK_DEBUG disabled. Do not use the .env.example placeholder.'
+        )
+
+    return secret_key
+
+
 class Config:
     # Flask Security
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    if not SECRET_KEY or SECRET_KEY == 'jobmitra-secret-2026':
-        # Generate an ephemeral secure key if none is securely supplied, with a warning
-        SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
-
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1', 'yes')
+    SECRET_KEY = resolve_secret_key(os.getenv('SECRET_KEY'), DEBUG)
+
     PORT = int(os.getenv('PORT', 5000))
 
     # Session & Cookie Security
