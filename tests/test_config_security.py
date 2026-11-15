@@ -20,11 +20,12 @@ def test_missing_secret_is_rejected_when_debug_is_disabled():
         resolve_secret_key(None, debug_mode=False)
 
 
-def test_missing_or_placeholder_secret_generates_ephemeral_key_in_debug():
-    generated = resolve_secret_key("jobmitra-secret-2026", debug_mode=True)
+@pytest.mark.parametrize("configured_key", [None, "jobmitra-secret-2026"])
+def test_missing_or_placeholder_secret_generates_ephemeral_key_in_debug(configured_key):
+    generated = resolve_secret_key(configured_key, debug_mode=True)
 
     assert len(generated) == 64
-    assert generated != "jobmitra-secret-2026"
+    assert generated != configured_key
 
 
 def test_configured_secret_is_preserved():
