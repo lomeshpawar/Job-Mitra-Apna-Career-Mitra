@@ -14,7 +14,7 @@ The report records a 29-case pytest execution. A separate route smoke-test scrip
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.14.8, pytest-9.1.1, pluggy-1.7.0
-rootdir: C:\Users\Lomesh Pawar\Downloads\JOB PORTAL 001
+rootdir: <repository-root>
 collected 29 items
 
 tests/test_applications_bookmarks.py::test_apply_to_job PASSED           [  3%]
