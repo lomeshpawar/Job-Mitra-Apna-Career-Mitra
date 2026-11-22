@@ -55,6 +55,7 @@ Job Mitra implements defense-in-depth across the entire application stack:
   - `SESSION_COOKIE_HTTPONLY = True` (mitigates XSS session hijacking).
   - `SESSION_COOKIE_SAMESITE = 'Lax'` (mitigates CSRF cross-site leakage).
   - `SESSION_COOKIE_SECURE = True` in production (ensures transmission exclusively over HTTPS).
+- Runtime startup rejects missing, short, or known example `SECRET_KEY` values outside the test configuration.
 
 ---
 
@@ -98,6 +99,8 @@ User-submitted payment references (UTRs) must never activate premium privileges 
 ```
 
 ### 4.2 Security Rules
+
+- The UPI destination is supplied through `UPI_ID`; missing or example placeholder values disable the payment QR/reference form and the reference-submission endpoint.
 1. **Uniqueness & Idempotency:** The `payments.utr_number` column has a unique database constraint. Re-submitting the same reference returns `409 Conflict`.
 2. **Amount & Catalog Verification:** The backend verifies that the submitted amount matches the catalog price for the requested plan (`Starter Boost ₹99`, `Graduate Pro ₹199`, `Lifetime Pass ₹499`).
 3. **No Sensitive Banking Data:** Card numbers, CVVs, UPI PINs, and net banking credentials are never collected or stored.

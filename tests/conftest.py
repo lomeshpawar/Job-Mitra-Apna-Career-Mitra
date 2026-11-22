@@ -12,6 +12,7 @@ from werkzeug.security import generate_password_hash
 os.environ['TESTING'] = 'True'
 os.environ['DB_ENGINE'] = 'sqlite'
 os.environ['SECRET_KEY'] = 'test-secret-key-for-pytest-execution-only'
+os.environ['UPI_ID'] = 'test-merchant@bank'
 
 from config import Config
 Config.TESTING = True

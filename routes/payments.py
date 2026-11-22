@@ -4,7 +4,7 @@ Handles subscription plan discovery, manual UPI reference submission (PENDING),
 and payment state verification.
 """
 from flask import Blueprint, request, jsonify, session
-from config import Config
+from config import Config, is_configured_upi_id
 from database import query_db
 from security import login_required, log_audit, sanitize_text
 
@@ -55,8 +55,10 @@ PLANS_CATALOG = [
 @payments_bp.route('/api/subscription/plans', methods=['GET'])
 def get_plans():
     """Returns available plans and active payment mode information."""
+    upi_id = Config.UPI_ID if is_configured_upi_id(Config.UPI_ID) else ""
     return jsonify({
-        "upi_id": Config.UPI_ID,
+        "upi_id": upi_id,
+        "payment_configured": bool(upi_id),
         "gateway_live": Config.PAYMENT_GATEWAY_LIVE,
         "gateway_name": Config.PAYMENT_GATEWAY_NAME,
         "mode": "DEMO_MANUAL_VERIFICATION" if not Config.PAYMENT_GATEWAY_LIVE else "LIVE_GATEWAY",
@@ -75,6 +77,12 @@ def submit_payment_reference():
     4. Explicitly labels the process as Demo / Manual Verification.
     5. Returns transparent status to candidate.
     """
+    if not is_configured_upi_id(Config.UPI_ID):
+        return jsonify({
+            "success": False,
+            "error": "UPI payment is not configured. Payment reference submission is temporarily unavailable."
+        }), 503
+
     user_id = session['user_id']
     data = request.json or {}
     utr = sanitize_text(data.get('utr_number', ''), 100).strip()
